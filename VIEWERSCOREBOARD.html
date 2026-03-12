@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>NRL Scoreboard - Live</title>
+    <style>
+        body { background: #121212; color: white; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; padding-top: 50px; }
+        .board { background: #1f1f1f; width: 600px; padding: 20px; border-radius: 12px; border: 1px solid #333; }
+        .header { display: flex; justify-content: space-between; color: #4caf50; font-weight: bold; font-size: 14px; margin-bottom: 20px; }
+        .main { display: flex; align-items: center; justify-content: space-between; text-align: center; }
+        .team { flex: 1; }
+        .team img { width: 70px; height: 70px; object-fit: contain; margin-bottom: 10px; }
+        .score { font-size: 64px; font-weight: 200; flex: 1.5; }
+        .team-name { font-size: 18px; color: #bbb; }
+    </style>
+</head>
+<body>
+    <div class="board">
+        <div class="header">
+            <span>Australian Rugby League</span>
+            <span id="timer">00:00</span>
+        </div>
+        <div class="main">
+            <div class="team">
+                <img id="hLogo" src="https://placehold.co/70x70/222/white?text=LOGO">
+                <div class="team-name" id="hName">Home</div>
+            </div>
+            <div class="score">
+                <span id="hScore">0</span> - <span id="aScore">0</span>
+            </div>
+            <div class="team">
+                <img id="aLogo" src="https://placehold.co/70x70/222/white?text=LOGO">
+                <div class="team-name" id="aName">Away</div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const firebaseConfig = { 
+            // PASTE THE SAME FIREBASE CONFIG HERE
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        onValue(ref(db, 'nrlMatch'), (snap) => {
+            const data = snap.val();
+            if(!data) return;
+            
+            document.getElementById('hScore').innerText = data.hScore || 0;
+            document.getElementById('aScore').innerText = data.aScore || 0;
+            document.getElementById('hName').innerText = data.hName || "Home";
+            document.getElementById('aName').innerText = data.aName || "Away";
+            if(data.hLogo) document.getElementById('hLogo').src = data.hLogo;
+            if(data.aLogo) document.getElementById('aLogo').src = data.aLogo;
+
+            // Format Timer
+            let m = Math.floor(data.time / 60);
+            let s = data.time % 60;
+            document.getElementById('timer').innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
+        });
+    </script>
+</body>
+</html>
