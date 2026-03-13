@@ -1,39 +1,49 @@
 <!DOCTYPE html>
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+<html>
+<head>
+    <title>NRL Scoreboard</title>
+    <style>
+        body { background: #121212; color: white; font-family: sans-serif; display: flex; justify-content: center; padding-top: 50px; }
+        .board { background: #1f1f1f; width: 600px; padding: 20px; border-radius: 12px; text-align: center; border: 1px solid #333; }
+        .score { font-size: 64px; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <div class="board">
+        <div id="timer">00:00</div>
+        <div class="score">
+            <span id="hName">Home</span> <span id="hScore">0</span> - 
+            <span id="aScore">0</span> <span id="aName">Away</span>
+        </div>
+    </div>
 
-    // Your specific Firebase keys
-    const firebaseConfig = { 
-        apiKey: "AIzaSyA8Ju6YR84BY8r2a7PtAzC41wLiPzU_Qck",
-        authDomain: "arl-scoreboard.firebaseapp.com",
-        databaseURL: "https://arl-scoreboard-default-rtdb.asia-southeast1.firebasedatabase.app",
-        projectId: "arl-scoreboard",
-        storageBucket: "arl-scoreboard.firebasestorage.app",
-        messagingSenderId: "530209602301",
-        appId: "1:530209602301:web:bf49f782881dbac7135c94",
-        measurementId: "G-H8XLL0YBPX"
-    };
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
+        const firebaseConfig = {
+            apiKey: "AIzaSyA8Ju6YR84BY8r2a7PtAzC41wLiPzU_Qck",
+            authDomain: "arl-scoreboard.firebaseapp.com",
+            databaseURL: "https://arl-scoreboard-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "arl-scoreboard",
+            storageBucket: "arl-scoreboard.firebasestorage.app",
+            messagingSenderId: "530209602301",
+            appId: "1:530209602301:web:bf49f782881dbac7135c94"
+        };
 
-    onValue(ref(db, 'nrlMatch'), (snap) => {
-        const data = snap.val();
-        if(!data) return;
-        
-        document.getElementById('hScore').innerText = data.hScore || 0;
-        document.getElementById('aScore').innerText = data.aScore || 0;
-        document.getElementById('hName').innerText = data.hName || "Home";
-        document.getElementById('aName').innerText = data.aName || "Away";
-        if(data.hLogo) document.getElementById('hLogo').src = data.hLogo;
-        if(data.aLogo) document.getElementById('aLogo').src = data.aLogo;
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
 
-        // Format Timer
-        let m = Math.floor(data.time / 60);
-        let s = data.time % 60;
-        document.getElementById('timer').innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
-    });
-</script>
-
-
+        onValue(ref(db, 'nrlMatch'), (snap) => {
+            const data = snap.val() || { hScore: 0, aScore: 0, hName: "Home", aName: "Away", time: 0 };
+            document.getElementById('hScore').innerText = data.hScore;
+            document.getElementById('aScore').innerText = data.aScore;
+            document.getElementById('hName').innerText = data.hName;
+            document.getElementById('aName').innerText = data.aName;
+            let m = Math.floor(data.time / 60);
+            let s = data.time % 60;
+            document.getElementById('timer').innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
+        });
+    </script>
+</body>
+</html>
