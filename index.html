@@ -1,14 +1,21 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>NRL Scoreboard - Live</title>
+    <title>ARL Scoreboard - Live</title>
     <style>
         body { background: #121212; color: white; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; padding-top: 50px; }
         .board { background: #1f1f1f; width: 600px; padding: 20px; border-radius: 12px; border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .header { display: flex; justify-content: space-between; align-items: center; color: #4caf50; font-weight: bold; font-size: 14px; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        
+        .live-container { display: flex; flex-direction: column; align-items: flex-end; width: 80px; }
+        .live-indicator { color: #ff4d4d; font-weight: bold; letter-spacing: 2px; animation: blinker 2s linear infinite; }
+        #matchStatus { color: #ff4d4d; font-size: 12px; margin-top: 2px; }
+        @keyframes blinker { 50% { opacity: 0.2; } }
+
         .timer-container { text-align: center; flex: 1; }
-        #timer { font-size: 24px; display: block; }
+        #timer { font-size: 24px; display: block; color: white; }
         #mainLogo { width: 50px; height: auto; margin-top: 5px; }
+        
         .main { display: flex; align-items: center; justify-content: space-between; text-align: center; }
         .team { flex: 1; }
         .team img { width: 80px; height: 80px; object-fit: contain; margin-bottom: 10px; background: #2a2a2a; border-radius: 50%; padding: 5px; }
@@ -24,7 +31,10 @@
                 <span id="timer">0:00</span>
                 <img id="mainLogo" src="https://upload.wikimedia.org/wikipedia/en/0/02/National_Rugby_League_logo.svg">
             </div>
-            <span>LIVE</span>
+            <div class="live-container">
+                <span class="live-indicator">LIVE</span>
+                <span id="matchStatus">1ST HALF</span>
+            </div>
         </div>
         <div class="main">
             <div class="team">
@@ -64,6 +74,7 @@
             document.getElementById('aScore').innerText = data.aScore ?? 0;
             document.getElementById('hName').innerText = data.hName || "Home";
             document.getElementById('aName').innerText = data.aName || "Away";
+            document.getElementById('matchStatus').innerText = data.status || "1ST HALF";
             
             if (data.hLogo) document.getElementById('hLogo').src = data.hLogo;
             if (data.aLogo) document.getElementById('aLogo').src = data.aLogo;
