@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>ARL Scoreboard - Live</title>
+    <title>NRL Scoreboard - Live</title>
     <style>
         body { background: #121212; color: white; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; padding-top: 50px; }
         .board { background: #1f1f1f; width: 600px; padding: 20px; border-radius: 12px; border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
@@ -17,7 +17,7 @@
     <div class="board">
         <div class="header">
             <span>AUSTRALIAN RUGBY LEAGUE</span>
-            <span id="timer">00:00</span>
+            <span id="timer">0:00</span>
         </div>
         <div class="main">
             <div class="team">
@@ -52,18 +52,24 @@
         const db = getDatabase(app);
 
         onValue(ref(db, 'nrlMatch'), (snap) => {
-            const data = snap.val() || { hScore: 0, aScore: 0, hName: "Home", aName: "Away", time: 0, hLogo: "", aLogo: "" };
+            const data = snap.val() || {};
             
-            document.getElementById('hScore').innerText = data.hScore;
-            document.getElementById('aScore').innerText = data.aScore;
-            document.getElementById('hName').innerText = data.hName;
-            document.getElementById('aName').innerText = data.aName;
+            // Fix: Fallback to 0 if scores are missing (prevents "undefined")
+            document.getElementById('hScore').innerText = data.hScore ?? 0;
+            document.getElementById('aScore').innerText = data.aScore ?? 0;
             
-            if(data.hLogo) document.getElementById('hLogo').src = data.hLogo;
-            if(data.aLogo) document.getElementById('aLogo').src = data.aLogo;
+            // Fix: Fallback to placeholders if names are missing
+            document.getElementById('hName').innerText = data.hName || "Home";
+            document.getElementById('aName').innerText = data.aName || "Away";
+            
+            // Fix: Update images only if a URL is provided
+            if (data.hLogo) document.getElementById('hLogo').src = data.hLogo;
+            if (data.aLogo) document.getElementById('aLogo').src = data.aLogo;
 
-            let m = Math.floor(data.time / 60);
-            let s = data.time % 60;
+            // Fix: Prevent "NaN" by ensuring time is a number
+            let totalSeconds = Number(data.time) || 0;
+            let m = Math.floor(totalSeconds / 60);
+            let s = totalSeconds % 60;
             document.getElementById('timer').innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
         });
     </script>
