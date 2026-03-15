@@ -1,50 +1,56 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>ARL Scoreboard - Live</title>
+    <title>NRL Scoreboard - Live</title>
     <style>
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; }
         body { 
-            /* This sets the stadium background */
-            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
-                        url('https://cdn.discordapp.com/attachments/1463812391375732915/1481987582152806562/Game_1.png?ex=69b54ffd&is=69b3fe7d&hm=78f7cc7108b68abfb0fde4b3871ab7fccb2e134d03016b42342a7d11dd03d153&');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            color: white; 
-            font-family: 'Segoe UI', sans-serif; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1513297887119-d46091b24bfa?auto=format&fit=crop&q=80&w=2070');
+            background-size: cover; background-position: center; color: white; font-family: 'Segoe UI', sans-serif; 
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
         }
 
         .board { 
-            background: rgba(31, 31, 31, 0.9); /* Slightly transparent */
-            backdrop-filter: blur(10px); /* Blurs the background behind the board */
-            width: 700px; 
-            padding: 30px; 
-            border-radius: 20px; 
-            border: 1px solid rgba(255,255,255,0.1); 
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8); 
+            background: rgba(20, 20, 20, 0.85); backdrop-filter: blur(15px); width: 750px; 
+            padding: 40px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.1); 
+            box-shadow: 0 30px 60px rgba(0,0,0,0.9); 
         }
 
-        .header { display: flex; justify-content: space-between; align-items: center; color: #4caf50; font-weight: bold; font-size: 14px; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; }
-        
+        /* NEW ALERT BOX STYLE */
+        #alertBox {
+            margin-top: 20px;
+            width: 750px;
+            background: rgba(183, 28, 28, 0.9); /* Deep Red */
+            color: white;
+            text-align: center;
+            padding: 15px 0;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border: 1px solid #ff5252;
+            display: none; /* Hidden by default */
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        .header { display: flex; justify-content: space-between; align-items: center; color: #4caf50; font-weight: bold; font-size: 14px; margin-bottom: 25px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; }
         .live-container { display: flex; flex-direction: column; align-items: flex-end; width: 100px; }
         .live-indicator { color: #ff4d4d; font-weight: bold; letter-spacing: 2px; animation: blinker 2s linear infinite; }
         #matchStatus { color: #ff4d4d; font-size: 12px; margin-top: 2px; }
         @keyframes blinker { 50% { opacity: 0.2; } }
 
         .timer-container { text-align: center; flex: 1; }
-        #timer { font-size: 32px; font-weight: 800; display: block; color: white; }
-        #mainLogo { width: 60px; height: auto; margin-top: 5px; }
+        #timer { font-size: 36px; font-weight: 800; display: block; color: white; }
+        #mainLogo { width: 65px; height: auto; }
         
         .main { display: flex; align-items: center; justify-content: space-between; text-align: center; }
         .team { flex: 1; }
-        .team img { width: 100px; height: 100px; object-fit: contain; margin-bottom: 10px; background: rgba(255,255,255,0.05); border-radius: 50%; padding: 10px; }
-        .score { font-size: 90px; font-weight: 900; flex: 1.5; color: #fff; text-shadow: 0 5px 15px rgba(0,0,0,0.5); }
-        .team-name { font-size: 24px; font-weight: bold; color: #fff; text-transform: uppercase; letter-spacing: 1px; }
+        .team img { width: 110px; height: 110px; object-fit: contain; margin-bottom: 12px; background: rgba(255,255,255,0.05); border-radius: 50%; padding: 10px; }
+        .score { font-size: 100px; font-weight: 900; flex: 1.5; color: #fff; }
+        .team-name { font-size: 26px; font-weight: bold; color: #fff; text-transform: uppercase; }
     </style>
 </head>
 <body>
@@ -62,18 +68,18 @@
         </div>
         <div class="main">
             <div class="team">
-                <img id="hLogo" src="https://placehold.co/100x100/222/white?text=LOGO">
+                <img id="hLogo" src="https://placehold.co/110x110/222/white?text=LOGO">
                 <div class="team-name" id="hName">Home</div>
             </div>
-            <div class="score">
-                <span id="hScore">0</span> - <span id="aScore">0</span>
-            </div>
+            <div class="score"><span id="hScore">0</span> - <span id="aScore">0</span></div>
             <div class="team">
-                <img id="aLogo" src="https://placehold.co/100x100/222/white?text=LOGO">
+                <img id="aLogo" src="https://placehold.co/110x110/222/white?text=LOGO">
                 <div class="team-name" id="aName">Away</div>
             </div>
         </div>
     </div>
+
+    <div id="alertBox">CUSTOM MESSAGE HERE</div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -103,9 +109,16 @@
             if (data.hLogo) document.getElementById('hLogo').src = data.hLogo;
             if (data.aLogo) document.getElementById('aLogo').src = data.aLogo;
             if (data.mainLogo) document.getElementById('mainLogo').src = data.mainLogo;
-            
-            // This part allows you to change the background image via Admin!
-            if (data.bgUrl) document.body.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('${data.bgUrl}')`;
+            if (data.bgUrl) document.body.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('${data.bgUrl}')`;
+
+            // Alert Logic
+            const alertBox = document.getElementById('alertBox');
+            if (data.alertMsg && data.showAlert) {
+                alertBox.innerText = data.alertMsg;
+                alertBox.style.display = 'block';
+            } else {
+                alertBox.style.display = 'none';
+            }
 
             let totalSeconds = Number(data.time) || 0;
             let m = Math.floor(totalSeconds / 60);
@@ -115,4 +128,3 @@
     </script>
 </body>
 </html>
-
