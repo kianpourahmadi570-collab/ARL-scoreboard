@@ -23,28 +23,33 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.5); display: none; z-index: 10;
         }
 
-        /* TRY ANIMATION */
+        /* TRY ANIMATION OVERLAY */
         .try-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: #ffcc00; color: black; display: flex; align-items: center; justify-content: center;
-            font-size: 50px; font-weight: 900; border-radius: 50%; opacity: 0; pointer-events: none;
+            font-size: 40px; font-weight: 900; border-radius: 50%; opacity: 0; pointer-events: none;
             transition: opacity 0.3s; z-index: 5;
         }
         .show-try { opacity: 1; animation: pulse 0.5s infinite; }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
 
         .header { display: flex; justify-content: space-between; align-items: center; color: #4caf50; font-weight: bold; font-size: 14px; margin-bottom: 25px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; }
+        
         .timer-container { text-align: center; flex: 1; }
-        #timer { font-size: 36px; font-weight: 800; display: block; color: white; }
+        #timer { font-size: 36px; font-weight: 800; display: block; color: white; margin-bottom: 5px; }
         #mainLogo { width: 65px; height: auto; }
         
         .main { display: flex; align-items: center; justify-content: space-between; text-align: center; }
-        .team { flex: 1; position: relative; }
+        .team { flex: 1; position: relative; display: flex; flex-direction: column; align-items: center; }
         .team img { width: 110px; height: 110px; object-fit: contain; background: rgba(255,255,255,0.05); border-radius: 50%; padding: 10px; }
-        .score { font-size: 100px; font-weight: 900; flex: 1.5; color: #fff; }
-        .team-name { font-size: 26px; font-weight: bold; color: #fff; text-transform: uppercase; }
+        .score { font-size: 100px; font-weight: 900; flex: 1.5; color: #fff; text-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        .team-name { font-size: 26px; font-weight: bold; color: #fff; text-transform: uppercase; margin-top: 10px; }
 
-        #alertBox { margin-top: 20px; width: 750px; background: rgba(183, 28, 28, 0.9); padding: 15px 0; border-radius: 12px; font-weight: bold; font-size: 20px; text-align: center; display: none; }
+        #alertBox {
+            margin-top: 20px; width: 750px; background: rgba(183, 28, 28, 0.9); color: white;
+            text-align: center; padding: 15px 0; border-radius: 12px; font-weight: bold;
+            font-size: 20px; text-transform: uppercase; border: 1px solid #ff5252; display: none;
+        }
     </style>
 </head>
 <body>
@@ -56,9 +61,9 @@
                 <span id="timer">0:00</span>
                 <img id="mainLogo" src="https://upload.wikimedia.org/wikipedia/en/0/02/National_Rugby_League_logo.svg">
             </div>
-            <div style="text-align: right; width: 100px;">
-                <span style="color: #ff4d4d; animation: blinker 2s infinite;">LIVE</span><br>
-                <span id="matchStatus" style="font-size: 12px; color: #ff4d4d;">1ST HALF</span>
+            <div style="text-align: right; width: 120px;">
+                <span style="color: #ff4d4d; font-weight:bold; letter-spacing:2px; animation: blinker 2s infinite;">LIVE</span><br>
+                <span id="matchStatus" style="font-size: 12px; color: #ff4d4d; font-weight:bold;">1ST HALF</span>
             </div>
         </div>
         <div class="main">
@@ -75,6 +80,7 @@
             </div>
         </div>
     </div>
+
     <div id="alertBox"></div>
 
     <script type="module">
@@ -97,14 +103,18 @@
 
         onValue(matchRef, (snap) => {
             const data = snap.val() || {};
+            
+            // Basic Info
             document.getElementById('hScore').innerText = data.hScore ?? 0;
             document.getElementById('aScore').innerText = data.aScore ?? 0;
             document.getElementById('hName').innerText = data.hName || "Home";
             document.getElementById('aName').innerText = data.aName || "Away";
             document.getElementById('matchStatus').innerText = data.status || "1ST HALF";
+            
+            // Finals Sticker
             document.getElementById('finalsSticker').style.display = data.isFinals ? 'block' : 'none';
 
-            // TRY ANIMATION LOGIC
+            // Try Animations (3-second auto-reset)
             if(data.tryHome) {
                 document.getElementById('hTry').classList.add('show-try');
                 setTimeout(() => update(matchRef, { tryHome: false }), 3000);
@@ -115,19 +125,32 @@
                 setTimeout(() => update(matchRef, { tryAway: false }), 3000);
             } else { document.getElementById('aTry').classList.remove('show-try'); }
 
+            // Logos and Background
             if (data.hLogo) document.getElementById('hLogo').src = data.hLogo;
             if (data.aLogo) document.getElementById('aLogo').src = data.aLogo;
             if (data.mainLogo) document.getElementById('mainLogo').src = data.mainLogo;
             if (data.bgUrl) document.body.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('${data.bgUrl}')`;
 
+            // Alerts
             const alertBox = document.getElementById('alertBox');
-            if (data.alertMsg && data.showAlert) { alertBox.innerText = data.alertMsg; alertBox.style.display = 'block'; } 
-            else { alertBox.style.display = 'none'; }
+            if (data.alertMsg && data.showAlert) {
+                alertBox.innerText = data.alertMsg;
+                alertBox.style.display = 'block';
+            } else {
+                alertBox.style.display = 'none';
+            }
 
+            // Timer
             let totalSeconds = Number(data.time) || 0;
-            let m = Math.floor(totalSeconds / 60); let s = totalSeconds % 60;
+            let m = Math.floor(totalSeconds / 60);
+            let s = totalSeconds % 60;
             document.getElementById('timer').innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
         });
+
+        // Blinking logic for LIVE
+        const style = document.createElement('style');
+        style.innerHTML = '@keyframes blinker { 50% { opacity: 0.2; } }';
+        document.head.appendChild(style);
     </script>
 </body>
 </html>
