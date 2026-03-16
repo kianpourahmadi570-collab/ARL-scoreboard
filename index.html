@@ -1,99 +1,103 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>ARL ADMIN - PC MASTER</title>
+    <title>NRL PRO BROADCAST - LIVE</title>
     <style>
-        body { background: #0f0f0f; color: white; font-family: 'Segoe UI', sans-serif; padding: 30px; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 1200px; margin: 0 auto; }
-        .card { background: #1a1a1a; padding: 25px; border-radius: 15px; border: 1px solid #333; }
-        
-        h3 { margin-top: 0; color: #4caf50; border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 20px; }
-        
-        .btn-row { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
-        button { padding: 15px 20px; cursor: pointer; border: none; border-radius: 8px; font-weight: bold; background: #333; color: white; flex: 1; }
-        button:hover { background: #444; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; }
+        body { 
+            background: #000; 
+            background-size: cover; background-position: center; 
+            color: white; font-family: 'Segoe UI', Roboto, Helvetica, sans-serif; 
+            display: flex; justify-content: center; align-items: center;
+        }
 
-        .btn-try { background: #ffcc00; color: black; font-size: 18px; }
-        .btn-add { background: #2e7d32; font-size: 20px; }
-        .btn-sub { background: #c62828; }
-        .btn-status { background: #6a1b9a; }
-        .btn-main { background: #007bff; padding: 20px; font-size: 18px; width: 100%; }
+        /* WIDER PC LAYOUT */
+        .board { 
+            position: relative; width: 1000px; height: 320px;
+            background: linear-gradient(180deg, rgba(30, 30, 30, 0.95) 0%, rgba(10, 10, 10, 0.95) 100%);
+            backdrop-filter: blur(20px); border-radius: 0 0 40px 40px; 
+            border: 2px solid rgba(255,255,255,0.1); border-top: 5px solid #4caf50;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.8); display: flex; flex-direction: column;
+        }
 
-        input { width: 95%; padding: 12px; margin-bottom: 15px; background: #262626; border: 1px solid #444; color: white; border-radius: 5px; }
-        .score-display { font-size: 40px; font-weight: 900; text-align: center; margin-bottom: 10px; color: #ffcc00; }
+        #finalsSticker {
+            position: absolute; top: -25px; left: 50%; transform: translateX(-50%);
+            background: #ffd700; color: black; padding: 5px 30px; font-weight: 900;
+            border-radius: 5px; letter-spacing: 3px; font-size: 14px; display: none;
+        }
+
+        .header { height: 60px; display: flex; align-items: center; padding: 0 40px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .comp-name { font-weight: 800; letter-spacing: 2px; color: #aaa; flex: 1; }
+        
+        .timer-center { display: flex; align-items: center; gap: 15px; background: rgba(0,0,0,0.3); padding: 5px 20px; border-radius: 30px; }
+        #timer { font-size: 32px; font-weight: 900; color: #fff; font-variant-numeric: tabular-nums; }
+        #mainLogo { height: 40px; width: auto; }
+        
+        .main-content { flex: 1; display: flex; align-items: center; padding: 0 50px; }
+        .team { flex: 1; display: flex; align-items: center; gap: 25px; position: relative; }
+        .team.away { flex-direction: row-reverse; text-align: right; }
+
+        .logo-wrap { position: relative; width: 130px; height: 130px; }
+        .team img { width: 100%; height: 100%; object-fit: contain; z-index: 1; position: relative; }
+        
+        .try-overlay {
+            position: absolute; inset: 0; background: #ffcc00; color: black;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 32px; font-weight: 900; border-radius: 50%; opacity: 0; z-index: 10;
+        }
+        .show-try { opacity: 1; animation: pulse 0.5s infinite; }
+
+        .team-name { font-size: 38px; font-weight: 800; text-transform: uppercase; letter-spacing: -1px; }
+        .score { font-size: 110px; font-weight: 900; width: 180px; text-align: center; color: #fff; text-shadow: 0 0 30px rgba(255,255,255,0.2); }
+
+        #alertBox {
+            position: absolute; bottom: -70px; width: 100%; background: #c62828;
+            color: white; text-align: center; padding: 12px 0; border-radius: 10px;
+            font-weight: bold; font-size: 22px; display: none; animation: slideUp 0.4s ease;
+        }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     </style>
 </head>
 <body>
-    <h1 style="text-align: center;">NRL BROADCAST CONTROL</h1>
-    
-    <div class="grid">
-        <div class="card">
-            <h3>Match Action</h3>
-            <div class="btn-row">
-                <button class="btn-try" onclick="triggerTry('tryHome')">HOME TRY!</button>
-                <button class="btn-try" onclick="triggerTry('tryAway')">AWAY TRY!</button>
+    <div class="board">
+        <div id="finalsSticker">FINALS SERIES</div>
+        <div class="header">
+            <div class="comp-name">NRL PREMIERSHIP</div>
+            <div class="timer-center">
+                <img id="mainLogo" src="https://upload.wikimedia.org/wikipedia/en/0/02/National_Rugby_League_logo.svg">
+                <span id="timer">00:00</span>
             </div>
-            <button class="btn-main" style="background:#ffd700; color:black; margin-bottom:20px;" onclick="toggleFinals()">TOGGLE FINALS SERIES STICKER</button>
-
-            <h3>Live Scores</h3>
-            <div class="btn-row">
-                <div style="flex:1; text-align:center;">
-                    <div class="score-display" id="disp_hScore">0</div>
-                    <button class="btn-add" onclick="changeScore('hScore', 4)">+4</button>
-                    <button class="btn-add" onclick="changeScore('hScore', 2)">+2</button>
-                    <button class="btn-sub" onclick="changeScore('hScore', -1)">-1</button>
-                </div>
-                <div style="flex:1; text-align:center;">
-                    <div class="score-display" id="disp_aScore">0</div>
-                    <button class="btn-add" onclick="changeScore('aScore', 4)">+4</button>
-                    <button class="btn-add" onclick="changeScore('aScore', 2)">+2</button>
-                    <button class="btn-sub" onclick="changeScore('aScore', -1)">-1</button>
-                </div>
-            </div>
-
-            <h3>Time Control</h3>
-            <button id="tBtn" class="btn-main" onclick="toggleTimer()">START TIMER</button>
-            <div class="btn-row" style="margin-top:10px;">
-                <button onclick="adjustTime(60)">+1 Min</button>
-                <button onclick="adjustTime(-60)">-1 Min</button>
-                <button onclick="resetTimer()">RESET 0:00</button>
+            <div style="flex: 1; text-align: right;">
+                <span style="color: #ff4d4d; font-weight: 900;">LIVE</span> | 
+                <span id="matchStatus" style="color: #4caf50;">1ST HALF</span>
             </div>
         </div>
-
-        <div class="card">
-            <h3>Broadcaster Alerts</h3>
-            <input type="text" id="alertInput" placeholder="Alert Message (e.g. VIDEO REFEREE)">
-            <div class="btn-row">
-                <button style="background:#e65100" onclick="toggleAlert(true)">SHOW ALERT</button>
-                <button onclick="toggleAlert(false)">HIDE ALERT</button>
-            </div>
-
-            <h3>Visuals Setup</h3>
-            <label>NRL Logo URL</label>
-            <input type="text" id="mainLogoInput" placeholder="Main Logo URL">
-            <label>Stadium Background URL</label>
-            <input type="text" id="bgUrlInput" placeholder="Stadium BG URL">
-            
-            <div class="btn-row">
-                <div style="flex:1">
-                    <label>Home Name</label><input type="text" id="hNameInput">
-                    <label>Home Logo URL</label><input type="text" id="hLogoInput">
+        <div class="main-content">
+            <div class="team home">
+                <div class="logo-wrap">
+                    <div id="hTry" class="try-overlay">TRY!</div>
+                    <img id="hLogo" src="https://placehold.co/130x130/222/fff?text=HOME">
                 </div>
-                <div style="flex:1">
-                    <label>Away Name</label><input type="text" id="aNameInput">
-                    <label>Away Logo URL</label><input type="text" id="aLogoInput">
-                </div>
+                <div class="team-name" id="hName">BRONCOS</div>
             </div>
-            
-            <button class="btn-main" style="background:#333" onclick="updateMatchInfo()">SAVE ALL VISUALS</button>
+            <div class="score"><span id="hScore">0</span> - <span id="aScore">0</span></div>
+            <div class="team away">
+                <div class="logo-wrap">
+                    <div id="aTry" class="try-overlay">TRY!</div>
+                    <img id="aLogo" src="https://placehold.co/130x130/222/fff?text=AWAY">
+                </div>
+                <div class="team-name" id="aName">STORM</div>
+            </div>
         </div>
+        <div id="alertBox">VIDEO REFEREE - CHECKING TRY</div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        const firebaseConfig = { 
+        const firebaseConfig = {
             apiKey: "AIzaSyA8Ju6YR84BY8r2a7PtAzC41wLiPzU_Qck",
             authDomain: "arl-scoreboard.firebaseapp.com",
             databaseURL: "https://arl-scoreboard-default-rtdb.asia-southeast1.firebasedatabase.app",
@@ -107,38 +111,38 @@
         const db = getDatabase(app);
         const matchRef = ref(db, 'nrlMatch');
 
-        let currentData = {};
-        onValue(matchRef, (snap) => { 
-            if(snap.exists()) {
-                currentData = snap.val();
-                document.getElementById('tBtn').innerText = currentData.isRunning ? "STOP TIMER" : "START TIMER";
-                document.getElementById('tBtn').style.background = currentData.isRunning ? "#c62828" : "#2e7d32";
-                document.getElementById('disp_hScore').innerText = currentData.hScore || 0;
-                document.getElementById('disp_aScore').innerText = currentData.aScore || 0;
-            }
+        onValue(matchRef, (snap) => {
+            const data = snap.val() || {};
+            document.getElementById('hScore').innerText = data.hScore ?? 0;
+            document.getElementById('aScore').innerText = data.aScore ?? 0;
+            document.getElementById('hName').innerText = data.hName || "HOME";
+            document.getElementById('aName').innerText = data.aName || "AWAY";
+            document.getElementById('matchStatus').innerText = data.status || "1ST HALF";
+            document.getElementById('finalsSticker').style.display = data.isFinals ? 'block' : 'none';
+
+            if(data.tryHome) {
+                document.getElementById('hTry').classList.add('show-try');
+                setTimeout(() => update(matchRef, { tryHome: false }), 3000);
+            } else { document.getElementById('hTry').classList.remove('show-try'); }
+
+            if(data.tryAway) {
+                document.getElementById('aTry').classList.add('show-try');
+                setTimeout(() => update(matchRef, { tryAway: false }), 3000);
+            } else { document.getElementById('aTry').classList.remove('show-try'); }
+
+            if (data.hLogo) document.getElementById('hLogo').src = data.hLogo;
+            if (data.aLogo) document.getElementById('aLogo').src = data.aLogo;
+            if (data.mainLogo) document.getElementById('mainLogo').src = data.mainLogo;
+            if (data.bgUrl) document.body.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('${data.bgUrl}')`;
+
+            const alertBox = document.getElementById('alertBox');
+            if (data.alertMsg && data.showAlert) { alertBox.innerText = data.alertMsg; alertBox.style.display = 'block'; }
+            else { alertBox.style.display = 'none'; }
+
+            let totalSeconds = Number(data.time) || 0;
+            let m = Math.floor(totalSeconds / 60); let s = totalSeconds % 60;
+            document.getElementById('timer').innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
         });
-
-        window.triggerTry = (team) => update(matchRef, { [team]: true });
-        window.toggleFinals = () => update(matchRef, { isFinals: !currentData.isFinals });
-        window.toggleAlert = (show) => update(matchRef, { showAlert: show, alertMsg: document.getElementById('alertInput').value });
-        window.changeScore = (f, a) => update(matchRef, { [f]: (currentData[f] || 0) + a });
-        window.adjustTime = (s) => update(matchRef, { time: (Number(currentData.time) || 0) + s });
-        window.toggleTimer = () => update(matchRef, { isRunning: !currentData.isRunning });
-        window.resetTimer = () => update(matchRef, { time: 0, isRunning: false });
-
-        window.updateMatchInfo = () => {
-            update(matchRef, {
-                mainLogo: document.getElementById('mainLogoInput').value || currentData.mainLogo || "",
-                bgUrl: document.getElementById('bgUrlInput').value || currentData.bgUrl || "",
-                hName: document.getElementById('hNameInput').value || currentData.hName || "",
-                hLogo: document.getElementById('hLogoInput').value || currentData.hLogo || "",
-                aName: document.getElementById('aNameInput').value || currentData.aName || "",
-                aLogo: document.getElementById('aLogoInput').value || currentData.aLogo || ""
-            });
-            alert("Settings Updated!");
-        };
-
-        setInterval(() => { if(currentData.isRunning) update(matchRef, { time: (Number(currentData.time) || 0) + 1 }); }, 1000);
     </script>
 </body>
 </html>
