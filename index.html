@@ -3,62 +3,70 @@
 <head>
     <title>ARL LIVE</title>
     <style>
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; transition: 0.5s; }
         body { background-size: cover; background-position: center; color: white; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; }
         #container { position: relative; width: 1050px; height: 320px; }
         .board { position: relative; width: 100%; height: 100%; background: rgba(15, 15, 15, 0.98); border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 50px 100px rgba(0,0,0,0.9); display: flex; flex-direction: column; z-index: 10; }
 
-        /* STATS DRAWER - FIXED POSITIONING */
-        #statsOverlay { 
-            position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); 
-            width: 850px; background: rgba(10, 10, 10, 0.98); border: 2px solid #333; 
-            border-radius: 0 0 15px 15px; padding: 15px 25px; transition: 0.6s ease-in-out; 
-            z-index: 5; display: flex; flex-direction: column; opacity: 0; pointer-events: none;
-        }
-        .stats-active #statsOverlay { bottom: -210px; opacity: 1; }
-        
+        /* SCORER POPUP (YELLOW SLIDE DOWN) */
+        .scorer-popup { position: absolute; bottom: -45px; left: 0; width: 100%; background: #ffcc00; color: #000; font-weight: 900; text-align: center; padding: 5px 0; font-size: 16px; transform: translateY(-100%); transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: -1; text-transform: uppercase; border-radius: 0 0 10px 10px; opacity: 0; }
+        .show-scorer { transform: translateY(0); opacity: 1; }
+
+        /* STATS DRAWER (FIXED) */
+        #statsOverlay { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 850px; background: rgba(10, 10, 10, 0.98); border: 2px solid #333; border-radius: 0 0 15px 15px; padding: 15px 25px; transition: 0.6s cubic-bezier(0.4, 0, 0.2, 1); z-index: 5; display: flex; flex-direction: column; opacity: 0; }
+        .stats-active #statsOverlay { bottom: -200px; opacity: 1; }
         .stat-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; padding: 5px 0; }
         .stat-label { font-weight: 800; color: #aaa; text-transform: uppercase; font-size: 11px; letter-spacing: 2px; }
         .stat-val { font-size: 20px; font-weight: 900; width: 100px; text-align: center; color: #ffcc00; }
 
         .scorer-columns { display: flex; justify-content: space-between; margin-top: 10px; gap: 20px; }
-        .scorer-list { width: 45%; font-size: 11px; font-weight: 700; color: #fff; text-transform: uppercase; line-height: 1.5; }
+        .scorer-list { width: 45%; font-size: 11px; font-weight: 700; color: #fff; text-transform: uppercase; line-height: 1.6; }
         #hScorerList { text-align: left; border-left: 3px solid #ffcc00; padding-left: 10px; }
         #aScorerList { text-align: right; border-right: 3px solid #ffcc00; padding-right: 10px; }
 
-        /* OTHER BROADCAST ELEMENTS */
-        .header { height: 60px; display: flex; align-items: center; padding: 0 40px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        /* STICKERS */
+        .sticker { position: absolute; top: -35px; left: 50%; transform: translateX(-50%); padding: 8px 40px; font-weight: 900; border-radius: 10px 10px 0 0; letter-spacing: 2px; font-size: 14px; display: none; text-transform: uppercase; }
+        #finalsSticker { background: #ffd700; color: black; }
+        #gfSticker { background: #2e7d32; color: white; border: 1px solid #4caf50; }
+        #gpSticker { background: #ff4d4d; color: white; }
+
+        .header { height: 60px; display: flex; align-items: center; padding: 0 40px; background: rgba(255,255,255,0.03); border-bottom: 1px solid rgba(255,255,255,0.05); }
         .timer-center { display: flex; align-items: center; gap: 15px; background: #000; padding: 5px 25px; border-radius: 30px; border: 1px solid #333; }
         #timer { font-size: 32px; font-weight: 900; width: 85px; text-align: center; font-variant-numeric: tabular-nums; }
         .main-content { flex: 1; display: flex; align-items: center; justify-content: space-between; padding: 0 60px; }
-        .team-name { font-size: 48px; font-weight: 900; text-transform: uppercase; }
+        .team { display: flex; align-items: center; gap: 30px; width: 380px; }
+        .team.away { flex-direction: row-reverse; text-align: right; }
+        .logo-wrap { position: relative; width: 150px; height: 150px; border-radius: 50%; background: #fff; border: 4px solid #333; flex-shrink: 0; }
+        .team img { width: 100%; height: 100%; object-fit: contain; border-radius: 50%; }
+        .try-overlay { position: absolute; inset: 0; background: #ffcc00; color: black; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 900; opacity: 0; z-index: 100; border-radius: 50%; pointer-events: none; }
+        .show-try { opacity: 1; animation: pulse 0.5s infinite; }
+        .team-name { font-size: 48px; font-weight: 900; flex: 1; text-transform: uppercase; }
         .score { font-size: 110px; font-weight: 900; display: flex; align-items: center; }
-        .sticker { position: absolute; top: -35px; left: 50%; transform: translateX(-50%); padding: 8px 40px; font-weight: 900; border-radius: 10px 10px 0 0; font-size: 14px; display: none; text-transform: uppercase; }
-        #gfSticker { background: #2e7d32; color: white; border: 1px solid #4caf50; }
+        #alertBox { position: absolute; bottom: 0; width: 100%; background: #b71c1c; text-align: center; padding: 10px 0; font-weight: bold; font-size: 22px; display: none; border-radius: 0 0 20px 20px; z-index: 20; text-transform: uppercase; }
+
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
     </style>
 </head>
 <body id="mainBody">
     <div id="container">
         <div class="board">
+            <div id="finalsSticker" class="sticker">FINALS SERIES</div>
             <div id="gfSticker" class="sticker">GRAND FINAL</div>
+            <div id="gpSticker" class="sticker">GOLDEN POINT</div>
             <div class="header">
-                <div style="flex:1; font-weight:700; color:#aaa;">ARL PREMIERSHIP</div>
-                <div class="timer-center"><span id="timer">40:00</span></div>
-                <div style="flex: 1; text-align: right; font-weight: 900;"><span style="color: #4caf50;" id="matchStatus">1ST HALF</span></div>
+                <div style="flex:1; font-weight:700; color:#aaa; font-size: 14px;">ARL PREMIERSHIP</div>
+                <div class="timer-center"><img id="mainLogo" src="https://upload.wikimedia.org/wikipedia/en/0/02/National_Rugby_League_logo.svg" style="height:35px"><span id="timer">40:00</span></div>
+                <div style="flex: 1; text-align: right; font-weight: 900; font-size: 14px;"><span style="color: #ff4d4d;">LIVE</span> | <span id="matchStatus" style="color: #4caf50;">1ST HALF</span></div>
             </div>
             <div class="main-content">
-                <div class="team-name" id="hName">HOME</div>
+                <div class="team home"><div class="logo-wrap"><div id="hTry" class="try-overlay">TRY!</div><div id="hScorerPopup" class="scorer-popup">PLAYER</div><img id="hLogo" src="https://placehold.co/150x150?text=HOME"></div><div class="team-name" id="hName">HOME</div></div>
                 <div class="score"><span id="hScore">0</span><div style="color:#444; margin: 0 10px;">-</div><span id="aScore">0</span></div>
-                <div class="team-name" id="aName" style="text-align:right">AWAY</div>
+                <div class="team away"><div class="logo-wrap"><div id="aTry" class="try-overlay">TRY!</div><div id="aScorerPopup" class="scorer-popup">PLAYER</div><img id="aLogo" src="https://placehold.co/150x150?text=AWAY"></div><div class="team-name" id="aName">AWAY</div></div>
             </div>
+            <div id="alertBox">VIDEO REFEREE</div>
         </div>
-
         <div id="statsOverlay">
-            <div class="stat-row">
-                <div class="stat-val" id="stat_hTries">0 | 0</div>
-                <div class="stat-label">TRIES | GOALS</div>
-                <div class="stat-val" id="stat_aTries">0 | 0</div>
-            </div>
+            <div class="stat-row"><div class="stat-val" id="stat_hTries">0 | 0</div><div class="stat-label">TRIES | GOALS</div><div class="stat-val" id="stat_aTries">0 | 0</div></div>
             <div class="scorer-columns">
                 <div id="hScorerList" class="scorer-list"></div>
                 <div id="aScorerList" class="scorer-list"></div>
@@ -68,7 +76,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const firebaseConfig = { apiKey: "AIzaSyA8Ju6YR84BY8r2a7PtAzC41wLiPzU_Qck", authDomain: "arl-scoreboard.firebaseapp.com", databaseURL: "https://arl-scoreboard-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "arl-scoreboard" };
         const app = initializeApp(firebaseConfig);
@@ -83,28 +91,49 @@
             document.getElementById('aName').innerText = data.aName || "AWAY";
             document.getElementById('matchStatus').innerText = data.status || "1ST HALF";
             
-            // Drawer Visibility
             document.getElementById('mainBody').classList.toggle('stats-active', !!data.showStats);
-
-            // Stats Row
             document.getElementById('stat_hTries').innerText = `${data.hTries || 0} | ${data.hConv || 0}`;
             document.getElementById('stat_aTries').innerText = `${data.aConv || 0} | ${data.aTries || 0}`;
 
-            // Scorer List - FIXED MAP LOGIC
-            const renderScorers = (hist) => {
-                if (!hist) return "";
-                // Use Object.values to turn Firebase objects into a clean array
-                return Object.values(hist).map(entry => `<div>${entry}</div>`).join('');
-            };
-            document.getElementById('hScorerList').innerHTML = renderScorers(data.hHistory);
-            document.getElementById('aScorerList').innerHTML = renderScorers(data.aHistory);
+            // DRAWER LIST LOGIC - CONVERTS OBJECTS TO NAMES
+            const getListHTML = (history) => history ? Object.values(history).map(name => `<div>${name}</div>`).join('') : "";
+            document.getElementById('hScorerList').innerHTML = getListHTML(data.hHistory);
+            document.getElementById('aScorerList').innerHTML = getListHTML(data.aHistory);
 
-            // Timer
-            let t = Number(data.time) || 0;
-            document.getElementById('timer').innerText = `${Math.floor(t/60)}:${(t%60).toString().padStart(2, '0')}`;
-            
-            // Grand Final Sticker
+            // SCORER POPUP LOGIC
+            if(data.showHPopup) { 
+                document.getElementById('hScorerPopup').innerText = data.recentH; 
+                document.getElementById('hScorerPopup').classList.add('show-scorer'); 
+                setTimeout(() => update(matchRef, { showHPopup: false }), 4000); 
+            } else { document.getElementById('hScorerPopup').classList.remove('show-scorer'); }
+
+            if(data.showAPopup) { 
+                document.getElementById('aScorerPopup').innerText = data.recentA; 
+                document.getElementById('aScorerPopup').classList.add('show-scorer'); 
+                setTimeout(() => update(matchRef, { showAPopup: false }), 4000); 
+            } else { document.getElementById('aScorerPopup').classList.remove('show-scorer'); }
+
+            // OVERLAYS & ALERTS
+            document.getElementById('finalsSticker').style.display = data.isFinals ? 'block' : 'none';
             document.getElementById('gfSticker').style.display = data.isGrandFinal ? 'block' : 'none';
+            document.getElementById('gpSticker').style.display = data.isGoldenPoint ? 'block' : 'none';
+            
+            if(data.tryHome) { document.getElementById('hTry').classList.add('show-try'); setTimeout(() => update(matchRef, { tryHome: false }), 3000); }
+            else { document.getElementById('hTry').classList.remove('show-try'); }
+            if(data.tryAway) { document.getElementById('aTry').classList.add('show-try'); setTimeout(() => update(matchRef, { tryAway: false }), 3000); }
+            else { document.getElementById('aTry').classList.remove('show-try'); }
+
+            if(data.bgUrl) document.body.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('${data.bgUrl}')`;
+            if(data.hLogo) document.getElementById('hLogo').src = data.hLogo;
+            if(data.aLogo) document.getElementById('aLogo').src = data.aLogo;
+
+            if(data.showAlert) { 
+                document.getElementById('alertBox').innerText = data.alertMsg || "VIDEO REFEREE"; 
+                document.getElementById('alertBox').style.display = 'block'; 
+            } else { document.getElementById('alertBox').style.display = 'none'; }
+
+            let t = Number(data.time) || 0;
+            document.getElementById('timer').innerText = `${Math.floor(t / 60)}:${(t % 60).toString().padStart(2, '0')}`;
         });
     </script>
 </body>
