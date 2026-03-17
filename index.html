@@ -3,61 +3,40 @@
 <head>
     <title>ARL LIVE BROADCAST</title>
     <style>
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; transition: background 0.8s ease; background-size: cover; background-position: center; }
-        body { color: white; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; }
-        #container { position: relative; width: 1050px; height: 320px; }
-        
-        /* MAIN BOARD */
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; transition: background 0.8s ease; background-size: cover; background-position: center; color: white; font-family: 'Segoe UI', sans-serif; }
+        #container { position: relative; width: 1050px; height: 320px; margin: 50px auto; }
         .board { position: relative; width: 100%; height: 100%; background: rgba(15, 15, 15, 0.98); border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 50px 100px rgba(0,0,0,0.9); display: flex; flex-direction: column; z-index: 10; overflow: hidden; }
-
-        /* VIDEO REF / ALERT BOX */
         #alertBox { position: absolute; bottom: 0; width: 100%; background: #b71c1c; text-align: center; padding: 12px 0; font-weight: 900; font-size: 24px; display: none; z-index: 20; text-transform: uppercase; letter-spacing: 3px; border-top: 2px solid #ff4d4d; }
-
-        /* SCORER POPUP (YELLOW SLIDE) */
         .scorer-popup { position: absolute; bottom: -45px; left: 0; width: 100%; background: #ffcc00; color: #000; font-weight: 900; text-align: center; padding: 5px 0; font-size: 16px; transform: translateY(-100%); transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: -1; text-transform: uppercase; border-radius: 0 0 10px 10px; opacity: 0; }
         .show-scorer { transform: translateY(0); opacity: 1; }
-
-        /* STATS DRAWER */
         #statsOverlay { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 850px; background: rgba(10, 10, 10, 0.98); border: 2px solid #333; border-radius: 0 0 15px 15px; padding: 15px 25px; transition: 0.6s cubic-bezier(0.4, 0, 0.2, 1); z-index: 5; display: flex; flex-direction: column; opacity: 0; }
         .stats-active #statsOverlay { bottom: -210px; opacity: 1; }
-        
-        .stat-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; padding: 5px 0; }
+        .stat-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; padding: 5px 0; margin-bottom: 10px; }
         .stat-label { font-weight: 800; color: #aaa; text-transform: uppercase; font-size: 11px; letter-spacing: 2px; }
         .stat-val { font-size: 20px; font-weight: 900; width: 120px; text-align: center; color: #ffcc00; }
-        .scorer-columns { display: flex; justify-content: space-between; margin-top: 10px; gap: 20px; }
-        .scorer-list { width: 45%; font-size: 11px; font-weight: 700; color: #fff; text-transform: uppercase; line-height: 1.6; }
+        .scorer-columns { display: flex; justify-content: space-between; gap: 20px; }
+        .scorer-list { width: 45%; font-size: 13px; font-weight: 700; color: #fff; text-transform: uppercase; line-height: 1.4; }
         #hScorerList { text-align: left; border-left: 3px solid #ffcc00; padding-left: 10px; }
         #aScorerList { text-align: right; border-right: 3px solid #ffcc00; padding-right: 10px; }
-
-        /* STICKERS */
-        .sticker { position: absolute; top: -35px; left: 50%; transform: translateX(-50%); padding: 8px 40px; font-weight: 900; border-radius: 10px 10px 0 0; font-size: 14px; display: none; text-transform: uppercase; }
-        #gfSticker { background: #2e7d32; color: white; border: 1px solid #4caf50; }
-        #finalsSticker { background: #ffd700; color: #000; }
-
-        /* HEADER */
         .header { height: 60px; display: flex; align-items: center; padding: 0 40px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .timer-center { display: flex; align-items: center; gap: 15px; background: #000; padding: 5px 25px; border-radius: 30px; border: 1px solid #333; }
         #timer { font-size: 32px; font-weight: 900; width: 95px; text-align: center; font-variant-numeric: tabular-nums; }
-        
         .main-content { flex: 1; display: flex; align-items: center; justify-content: space-between; padding: 0 60px; }
         .team { display: flex; align-items: center; gap: 30px; width: 380px; }
         .team.away { flex-direction: row-reverse; text-align: right; }
         .logo-wrap { position: relative; width: 150px; height: 150px; border-radius: 50%; background: #fff; border: 4px solid #333; flex-shrink: 0; }
         .team img { width: 100%; height: 100%; object-fit: contain; border-radius: 50%; }
-        
         .try-overlay { position: absolute; inset: 0; background: #ffcc00; color: black; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 900; opacity: 0; z-index: 100; border-radius: 50%; pointer-events: none; }
         .show-try { opacity: 1; animation: pulse 0.5s infinite; }
         .team-name { font-size: 48px; font-weight: 900; flex: 1; text-transform: uppercase; }
         .score { font-size: 110px; font-weight: 900; display: flex; align-items: center; }
-
+        #convTag { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); color: #ffcc00; font-weight: 900; font-size: 12px; display: none; z-index: 15; text-transform: uppercase; }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
     </style>
 </head>
 <body id="mainBody">
     <div id="container">
         <div class="board">
-            <div id="gfSticker" class="sticker">GRAND FINAL</div>
-            <div id="finalsSticker" class="sticker">FINALS SERIES</div>
             <div class="header">
                 <div style="flex:1; font-weight:700; color:#aaa;">ARL PREMIERSHIP</div>
                 <div class="timer-center">
@@ -71,7 +50,7 @@
                     <div class="logo-wrap">
                         <div id="hTry" class="try-overlay">TRY!</div>
                         <div id="hScorerPopup" class="scorer-popup">PLAYER</div>
-                        <img id="hLogo" src="https://placehold.co/150x150?text=HOME">
+                        <img id="hLogo" src="">
                     </div>
                     <div class="team-name" id="hName">HOME</div>
                 </div>
@@ -80,14 +59,14 @@
                     <div class="logo-wrap">
                         <div id="aTry" class="try-overlay">TRY!</div>
                         <div id="aScorerPopup" class="scorer-popup">PLAYER</div>
-                        <img id="aLogo" src="https://placehold.co/150x150?text=AWAY">
+                        <img id="aLogo" src="">
                     </div>
                     <div class="team-name" id="aName">AWAY</div>
                 </div>
             </div>
+            <div id="convTag">CONVERSION PENDING</div>
             <div id="alertBox">VIDEO REFEREE</div>
         </div>
-
         <div id="statsOverlay">
             <div class="stat-row">
                 <div class="stat-val" id="stat_hTries">0 | 0</div>
@@ -100,11 +79,9 @@
             </div>
         </div>
     </div>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-
         const firebaseConfig = { apiKey: "AIzaSyA8Ju6YR84BY8r2a7PtAzC41wLiPzU_Qck", authDomain: "arl-scoreboard.firebaseapp.com", databaseURL: "https://arl-scoreboard-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "arl-scoreboard" };
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
@@ -112,52 +89,44 @@
 
         onValue(matchRef, (snap) => {
             const data = snap.val() || {};
+            document.getElementById('mainBody').classList.toggle('stats-active', !!data.showStats);
+            document.getElementById('stat_hTries').innerText = `${data.hTries || 0} | ${data.hConv || 0}`;
+            document.getElementById('stat_aTries').innerText = `${data.aConv || 0} | ${data.aTries || 0}`;
+
+            const renderGrouped = (historyObj) => {
+                if (!historyObj) return "";
+                const summary = {};
+                Object.values(historyObj).forEach(entry => {
+                    const parts = entry.split(' (');
+                    const name = parts[0].toUpperCase();
+                    const type = parts[1].replace(')', '');
+                    if (!summary[name]) summary[name] = { t: 0, g: 0 };
+                    type === 'TRY' ? summary[name].t++ : summary[name].g++;
+                });
+                return Object.entries(summary).map(([name, counts]) => {
+                    let d = []; if(counts.t > 0) d.push(`${counts.t}T`); if(counts.g > 0) d.push(`${counts.g}G`);
+                    return `<div style="margin-bottom:4px; border-bottom:1px solid #222;">${name}: <span style="color:#ffcc00">${d.join(' ')}</span></div>`;
+                }).join('');
+            };
+            document.getElementById('hScorerList').innerHTML = renderGrouped(data.hHistory);
+            document.getElementById('aScorerList').innerHTML = renderGrouped(data.aHistory);
             document.getElementById('hScore').innerText = data.hScore || 0;
             document.getElementById('aScore').innerText = data.aScore || 0;
             document.getElementById('hName').innerText = data.hName || "HOME";
             document.getElementById('aName').innerText = data.aName || "AWAY";
             document.getElementById('matchStatus').innerText = data.status || "1ST HALF";
-            
-            document.getElementById('mainBody').classList.toggle('stats-active', !!data.showStats);
-            document.getElementById('stat_hTries').innerText = `${data.hTries || 0} | ${data.hConv || 0}`;
-            document.getElementById('stat_aTries').innerText = `${data.aConv || 0} | ${data.aTries || 0}`;
-
-            const renderList = (hist) => hist ? Object.values(hist).map(n => `<div>${n}</div>`).join('') : "";
-            document.getElementById('hScorerList').innerHTML = renderList(data.hHistory);
-            document.getElementById('aScorerList').innerHTML = renderList(data.aHistory);
-
-            if(data.showHPopup) { 
-                document.getElementById('hScorerPopup').innerText = data.recentH; 
-                document.getElementById('hScorerPopup').classList.add('show-scorer'); 
-                setTimeout(() => update(matchRef, { showHPopup: false }), 4500); 
-            } else { document.getElementById('hScorerPopup').classList.remove('show-scorer'); }
-            
-            if(data.showAPopup) { 
-                document.getElementById('aScorerPopup').innerText = data.recentA; 
-                document.getElementById('aScorerPopup').classList.add('show-scorer'); 
-                setTimeout(() => update(matchRef, { showAPopup: false }), 4500); 
-            } else { document.getElementById('aScorerPopup').classList.remove('show-scorer'); }
-
-            if(data.tryHome) { document.getElementById('hTry').classList.add('show-try'); } else { document.getElementById('hTry').classList.remove('show-try'); }
-            if(data.tryAway) { document.getElementById('aTry').classList.add('show-try'); } else { document.getElementById('aTry').classList.remove('show-try'); }
-
-            document.getElementById('gfSticker').style.display = data.isGrandFinal ? 'block' : 'none';
-            document.getElementById('finalsSticker').style.display = data.isFinals ? 'block' : 'none';
-            
+            document.getElementById('convTag').style.display = data.convPending ? 'block' : 'none';
+            if(data.showHPopup) { document.getElementById('hScorerPopup').innerText = data.recentH; document.getElementById('hScorerPopup').classList.add('show-scorer'); } else { document.getElementById('hScorerPopup').classList.remove('show-scorer'); }
+            if(data.showAPopup) { document.getElementById('aScorerPopup').innerText = data.recentA; document.getElementById('aScorerPopup').classList.add('show-scorer'); } else { document.getElementById('aScorerPopup').classList.remove('show-scorer'); }
+            if(data.tryHome) document.getElementById('hTry').classList.add('show-try'); else document.getElementById('hTry').classList.remove('show-try');
+            if(data.tryAway) document.getElementById('aTry').classList.add('show-try'); else document.getElementById('aTry').classList.remove('show-try');
             if(data.bgUrl) document.body.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('${data.bgUrl}')`;
             if(data.mainLogoUrl) { document.getElementById('mainLogo').src = data.mainLogoUrl; document.getElementById('mainLogo').style.display = 'block'; }
             if(data.hLogo) document.getElementById('hLogo').src = data.hLogo;
             if(data.aLogo) document.getElementById('aLogo').src = data.aLogo;
-
-            if(data.showAlert) { 
-                document.getElementById('alertBox').innerText = data.alertMsg || "VIDEO REFEREE"; 
-                document.getElementById('alertBox').style.display = 'block'; 
-            } else { document.getElementById('alertBox').style.display = 'none'; }
-
+            if(data.showAlert) { document.getElementById('alertBox').innerText = data.alertMsg || "VIDEO REFEREE"; document.getElementById('alertBox').style.display = 'block'; } else { document.getElementById('alertBox').style.display = 'none'; }
             let t = Number(data.time) || 0;
-            const mins = Math.floor(t / 60);
-            const secs = (t % 60).toString().padStart(2, '0');
-            document.getElementById('timer').innerText = `${mins}:${secs}`;
+            document.getElementById('timer').innerText = `${Math.floor(t / 60)}:${(t % 60).toString().padStart(2, '0')}`;
         });
     </script>
 </body>
