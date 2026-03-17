@@ -1,161 +1,158 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>ARL PRO BROADCAST - LIVE</title>
+    <title>NRL PRO BROADCAST - LIVE</title>
     <style>
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; }
-        body { 
-            background-size: cover; background-position: center; 
-            color: white; font-family: 'Segoe UI', Roboto, sans-serif; 
-            display: flex; justify-content: center; align-items: center;
-        }
+        body { background-size: cover; background-position: center; color: white; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; }
+
+        #container { position: relative; width: 1050px; height: 320px; transition: transform 0.5s ease-in-out; }
 
         .board { 
-            position: relative; width: 1050px; height: 320px;
-            background: rgba(15, 15, 15, 0.98);
-            border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);
-            box-shadow: 0 50px 100px rgba(0,0,0,0.9); display: flex; flex-direction: column;
+            position: relative; width: 100%; height: 100%;
+            background: rgba(15, 15, 15, 0.98); border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 50px 100px rgba(0,0,0,0.9); display: flex; flex-direction: column; z-index: 10;
         }
 
-        #finalsSticker {
-            position: absolute; top: -35px; left: 50%; transform: translateX(-50%);
-            background: #ffd700; color: black; padding: 8px 40px; font-weight: 900;
-            border-radius: 10px 10px 0 0; letter-spacing: 2px; font-size: 14px; 
-            display: none; z-index: 100; text-transform: uppercase;
-            box-shadow: 0 -5px 15px rgba(0,0,0,0.3);
+        /* STATS DRAWER */
+        #statsOverlay {
+            position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 800px; background: rgba(10, 10, 10, 0.95); border: 1px solid #333;
+            border-radius: 0 0 15px 15px; padding: 20px; transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 5; display: flex; flex-direction: column; gap: 8px; opacity: 0;
         }
+        .stats-active #statsOverlay { bottom: -120px; opacity: 1; }
+        .stat-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; padding: 5px 0; }
+        .stat-label { font-weight: 800; color: #aaa; text-transform: uppercase; font-size: 13px; letter-spacing: 1px; }
+        .stat-val { font-size: 22px; font-weight: 900; width: 50px; text-align: center; }
 
-        .header { 
-            height: 60px; display: flex; align-items: center; padding: 0 40px; 
-            background: rgba(255,255,255,0.03); border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-        
-        .timer-center { 
-            display: flex; align-items: center; gap: 15px; 
-            background: #000; padding: 5px 25px; border-radius: 30px; border: 1px solid #333;
-        }
-        #timer { font-size: 32px; font-weight: 900; color: #fff; font-variant-numeric: tabular-nums; width: 80px; text-align: center;}
-        #mainLogo { height: 35px; width: auto; }
+        /* STICKERS */
+        .sticker { position: absolute; top: -35px; left: 50%; transform: translateX(-50%); padding: 8px 40px; font-weight: 900; border-radius: 10px 10px 0 0; letter-spacing: 2px; font-size: 14px; display: none; text-transform: uppercase; box-shadow: 0 -5px 15px rgba(0,0,0,0.3); }
+        #finalsSticker { background: #ffd700; color: black; }
+        #gfSticker { background: #fff; color: black; border: 1px solid #ffd700; }
+        #gpSticker { background: #ff4d4d; color: white; }
+
+        .header { height: 60px; display: flex; align-items: center; padding: 0 40px; background: rgba(255,255,255,0.03); border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .timer-center { display: flex; align-items: center; gap: 15px; background: #000; padding: 5px 25px; border-radius: 30px; border: 1px solid #333; }
+        #timer { font-size: 32px; font-weight: 900; width: 85px; text-align: center; font-variant-numeric: tabular-nums; }
         
         .main-content { flex: 1; display: flex; align-items: center; justify-content: space-between; padding: 0 60px; }
         .team { display: flex; align-items: center; gap: 30px; width: 380px; }
         .team.away { flex-direction: row-reverse; text-align: right; }
-
-        .logo-wrap { 
-            position: relative; width: 150px; height: 150px; 
-            border-radius: 50%; overflow: hidden;
-            background: #fff; border: 4px solid #333;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5); flex-shrink: 0;
-        }
+        .logo-wrap { position: relative; width: 150px; height: 150px; border-radius: 50%; overflow: hidden; background: #fff; border: 4px solid #333; flex-shrink: 0; }
         .team img { width: 100%; height: 100%; object-fit: contain; }
-        
-        .try-overlay {
-            position: absolute; inset: 0; background: #ffcc00; color: black;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 32px; font-weight: 900; opacity: 0; z-index: 10;
-        }
+        .try-overlay { position: absolute; inset: 0; background: #ffcc00; color: black; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 900; opacity: 0; z-index: 100; }
         .show-try { opacity: 1; animation: pulse 0.5s infinite; }
-
-        .team-name { font-size: 48px; font-weight: 900; letter-spacing: -1px; flex: 1; text-transform: uppercase; }
-
-        .score-container { display: flex; align-items: center; justify-content: center; min-width: 200px; }
-        .score { font-size: 110px; font-weight: 900; color: #fff; display: flex; align-items: center; }
-        .score span { min-width: 60px; text-align: center; }
-
-        #alertBox {
-            position: absolute; bottom: 0; width: 100%; background: #b71c1c;
-            color: white; text-align: center; padding: 10px 0; font-weight: bold; 
-            font-size: 20px; display: none; border-radius: 0 0 20px 20px;
-        }
+        .team-name { font-size: 48px; font-weight: 900; flex: 1; text-transform: uppercase; letter-spacing: -1px; }
+        .score { font-size: 110px; font-weight: 900; display: flex; align-items: center; }
+        #alertBox { position: absolute; bottom: 0; width: 100%; background: #b71c1c; text-align: center; padding: 10px 0; font-weight: bold; font-size: 20px; display: none; border-radius: 0 0 20px 20px; }
 
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
     </style>
 </head>
-<body>
-    <div class="board">
-        <div id="finalsSticker">FINALS SERIES</div>
-        <div class="header">
-            <div style="flex:1; font-weight:700; color:#aaa; font-size: 14px; letter-spacing: 1px;">ARL PREMIERSHIP</div>
-            <div class="timer-center">
-                <img id="mainLogo" src="https://upload.wikimedia.org/wikipedia/en/0/02/National_Rugby_League_logo.svg">
-                <span id="timer">00:00</span>
+<body id="mainBody">
+    <div id="container">
+        <div class="board">
+            <div id="finalsSticker" class="sticker">FINALS SERIES</div>
+            <div id="gfSticker" class="sticker">GRAND FINAL</div>
+            <div id="gpSticker" class="sticker">GOLDEN POINT</div>
+            
+            <div class="header">
+                <div style="flex:1; font-weight:700; color:#aaa; font-size: 14px; letter-spacing: 1px;">NRL PREMIERSHIP</div>
+                <div class="timer-center">
+                    <img id="mainLogo" src="https://upload.wikimedia.org/wikipedia/en/0/02/National_Rugby_League_logo.svg" style="height:35px">
+                    <span id="timer">40:00</span>
+                </div>
+                <div style="flex: 1; text-align: right; font-weight: 900; font-size: 14px;">
+                    <span style="color: #ff4d4d;">LIVE</span> | <span id="matchStatus" style="color: #4caf50;">1ST HALF</span>
+                </div>
             </div>
-            <div style="flex: 1; text-align: right; font-weight: 900; font-size: 14px;">
-                <span style="color: #ff4d4d;">LIVE</span> | <span id="matchStatus" style="color: #4caf50;">1ST HALF</span>
+
+            <div class="main-content">
+                <div class="team home">
+                    <div class="logo-wrap">
+                        <div id="hTry" class="try-overlay">TRY!</div>
+                        <img id="hLogo" src="https://placehold.co/150x150/fff/000?text=HOME">
+                    </div>
+                    <div class="team-name" id="hName">HOME</div>
+                </div>
+                <div class="score"><span id="hScore">0</span><div style="color:#444; margin: 0 10px;">-</div><span id="aScore">0</span></div>
+                <div class="team away">
+                    <div class="logo-wrap">
+                        <div id="aTry" class="try-overlay">TRY!</div>
+                        <img id="aLogo" src="https://placehold.co/150x150/fff/000?text=AWAY">
+                    </div>
+                    <div class="team-name" id="aName">AWAY</div>
+                </div>
+            </div>
+            <div id="alertBox">VIDEO REFEREE</div>
+        </div>
+
+        <div id="statsOverlay">
+            <div class="stat-row">
+                <div class="stat-val" id="stat_hTries" style="color:#ffcc00">0</div>
+                <div class="stat-label">TOTAL TRIES</div>
+                <div class="stat-val" id="stat_aTries" style="color:#ffcc00">0</div>
+            </div>
+            <div class="stat-row">
+                <div class="stat-val" id="stat_hConv">0</div>
+                <div class="stat-label">CONVERSIONS</div>
+                <div class="stat-val" id="stat_aConv">0</div>
             </div>
         </div>
-        
-        <div class="main-content">
-            <div class="team home">
-                <div class="logo-wrap">
-                    <div id="hTry" class="try-overlay">TRY!</div>
-                    <img id="hLogo" src="https://placehold.co/150x150/fff/000?text=HOME">
-                </div>
-                <div class="team-name" id="hName">HOME</div>
-            </div>
-            <div class="score-container">
-                <div class="score"><span id="hScore">0</span><div style="color:#444">-</div><span id="aScore">0</span></div>
-            </div>
-            <div class="team away">
-                <div class="logo-wrap">
-                    <div id="aTry" class="try-overlay">TRY!</div>
-                    <img id="aLogo" src="https://placehold.co/150x150/fff/000?text=AWAY">
-                </div>
-                <div class="team-name" id="aName">AWAY</div>
-            </div>
-        </div>
-        <div id="alertBox">VIDEO REFEREE</div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        const firebaseConfig = {
+        const firebaseConfig = { 
             apiKey: "AIzaSyA8Ju6YR84BY8r2a7PtAzC41wLiPzU_Qck",
             authDomain: "arl-scoreboard.firebaseapp.com",
             databaseURL: "https://arl-scoreboard-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "arl-scoreboard",
-            storageBucket: "arl-scoreboard.firebasestorage.app",
-            messagingSenderId: "530209602301",
-            appId: "1:530209602301:web:bf49f782881dbac7135c94"
+            projectId: "arl-scoreboard"
         };
-
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const matchRef = ref(db, 'nrlMatch');
 
         onValue(matchRef, (snap) => {
             const data = snap.val() || {};
-            document.getElementById('hScore').innerText = data.hScore ?? 0;
-            document.getElementById('aScore').innerText = data.aScore ?? 0;
+            document.getElementById('hScore').innerText = data.hScore || 0;
+            document.getElementById('aScore').innerText = data.aScore || 0;
             document.getElementById('hName').innerText = data.hName || "HOME";
             document.getElementById('aName').innerText = data.aName || "AWAY";
             document.getElementById('matchStatus').innerText = data.status || "1ST HALF";
+            
+            document.getElementById('stat_hTries').innerText = data.hTries || 0;
+            document.getElementById('stat_aTries').innerText = data.aTries || 0;
+            document.getElementById('stat_hConv').innerText = data.hConv || 0;
+            document.getElementById('stat_aConv').innerText = data.aConv || 0;
+            
+            if(data.showStats) document.getElementById('mainBody').classList.add('stats-active');
+            else document.getElementById('mainBody').classList.remove('stats-active');
+
             document.getElementById('finalsSticker').style.display = data.isFinals ? 'block' : 'none';
+            document.getElementById('gfSticker').style.display = data.isGrandFinal ? 'block' : 'none';
+            document.getElementById('gpSticker').style.display = data.isGoldenPoint ? 'block' : 'none';
 
-            if(data.tryHome) {
-                document.getElementById('hTry').classList.add('show-try');
-                setTimeout(() => update(matchRef, { tryHome: false }), 3000);
-            } else { document.getElementById('hTry').classList.remove('show-try'); }
+            if(data.tryHome) { document.getElementById('hTry').classList.add('show-try'); setTimeout(() => update(matchRef, { tryHome: false }), 3000); }
+            else document.getElementById('hTry').classList.remove('show-try');
+            
+            if(data.tryAway) { document.getElementById('aTry').classList.add('show-try'); setTimeout(() => update(matchRef, { tryAway: false }), 3000); }
+            else document.getElementById('aTry').classList.remove('show-try');
 
-            if(data.tryAway) {
-                document.getElementById('aTry').classList.add('show-try');
-                setTimeout(() => update(matchRef, { tryAway: false }), 3000);
-            } else { document.getElementById('aTry').classList.remove('show-try'); }
-
-            if (data.hLogo) document.getElementById('hLogo').src = data.hLogo;
-            if (data.aLogo) document.getElementById('aLogo').src = data.aLogo;
-            if (data.mainLogo) document.getElementById('mainLogo').src = data.mainLogo;
-            if (data.bgUrl) document.body.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('${data.bgUrl}')`;
+            if(data.hLogo) document.getElementById('hLogo').src = data.hLogo;
+            if(data.aLogo) document.getElementById('aLogo').src = data.aLogo;
+            if(data.mainLogo) document.getElementById('mainLogo').src = data.mainLogo;
+            if(data.bgUrl) document.body.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('${data.bgUrl}')`;
 
             const alert = document.getElementById('alertBox');
             if (data.alertMsg && data.showAlert) { alert.innerText = data.alertMsg; alert.style.display = 'block'; }
-            else { alert.style.display = 'none'; }
+            else alert.style.display = 'none';
 
             let totalSeconds = Number(data.time) || 0;
-            let m = Math.floor(totalSeconds / 60);
-            let s = totalSeconds % 60;
+            let m = Math.floor(totalSeconds / 60); let s = totalSeconds % 60;
             document.getElementById('timer').innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
         });
     </script>
