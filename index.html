@@ -30,20 +30,20 @@
         .scorer-popup { position: absolute; bottom: -45px; left: 0; width: 100%; background: #ffcc00; color: #000; font-weight: 900; text-align: center; padding: 5px 0; font-size: 16px; transform: translateY(-100%); transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: -1; text-transform: uppercase; border-radius: 0 0 10px 10px; opacity: 0; }
         .show-scorer { transform: translateY(0); opacity: 1; }
 
-        #statsOverlay { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 850px; background: rgba(10, 10, 10, 0.98); border: 2px solid #333; border-radius: 0 0 15px 15px; padding: 15px 25px; transition: 0.6s cubic-bezier(0.4, 0, 0.2, 1); z-index: 5; display: flex; flex-direction: column; opacity: 0; }
-        .stats-active #statsOverlay { bottom: -210px; opacity: 1; }
+        #statsOverlay { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 850px; background: rgba(10, 10, 10, 0.98); border: 2px solid #333; border-radius: 0 0 15px 15px; padding: 10px 25px; transition: 0.6s cubic-bezier(0.4, 0, 0.2, 1); z-index: 5; display: flex; flex-direction: column; opacity: 0; }
+        .stats-active #statsOverlay { bottom: -240px; opacity: 1; }
         
-        .stat-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; padding: 5px 0; }
-        .stat-label { font-weight: 800; color: #aaa; text-transform: uppercase; font-size: 11px; letter-spacing: 2px; }
-        .stat-val { font-size: 20px; font-weight: 900; width: 120px; text-align: center; color: #ffcc00; }
-        .scorer-columns { display: flex; justify-content: space-between; margin-top: 10px; gap: 20px; }
-        .scorer-list { width: 45%; font-size: 11px; font-weight: 700; color: #fff; text-transform: uppercase; line-height: 1.6; }
+        .stat-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; padding: 4px 0; }
+        .stat-label { font-weight: 800; color: #aaa; text-transform: uppercase; font-size: 10px; letter-spacing: 2px; }
+        .stat-val { font-size: 18px; font-weight: 900; width: 120px; text-align: center; color: #ffcc00; }
+        .scorer-columns { display: flex; justify-content: space-between; margin-top: 8px; gap: 20px; }
+        .scorer-list { width: 45%; font-size: 11px; font-weight: 700; color: #fff; text-transform: uppercase; line-height: 1.5; }
         #hScorerList { text-align: left; border-left: 3px solid #ffcc00; padding-left: 10px; }
         #aScorerList { text-align: right; border-right: 3px solid #ffcc00; padding-right: 10px; }
 
         #customStatBox {
             text-align: center; font-size: 13px; font-weight: 800; color: #ffcc00;
-            margin-top: 10px; padding-top: 8px; border-top: 1px solid #222;
+            margin-top: 8px; padding-top: 5px; border-top: 1px solid #222;
             white-space: pre-wrap; text-transform: uppercase; letter-spacing: 1px;
         }
 
@@ -107,6 +107,11 @@
                 <div class="stat-label">TRIES | GOALS</div>
                 <div class="stat-val" id="stat_aTries">0 | 0</div>
             </div>
+            <div class="stat-row">
+                <div class="stat-val" id="stat_hFG">0 | 0</div>
+                <div class="stat-label">1PT FG | 2PT FG</div>
+                <div class="stat-val" id="stat_aFG">0 | 0</div>
+            </div>
             <div class="scorer-columns">
                 <div id="hScorerList" class="scorer-list"></div>
                 <div id="aScorerList" class="scorer-list"></div>
@@ -135,6 +140,8 @@
             document.getElementById('mainBody').classList.toggle('stats-active', !!data.showStats);
             document.getElementById('stat_hTries').innerText = `${data.hTries || 0} | ${data.hConv || 0}`;
             document.getElementById('stat_aTries').innerText = `${data.aConv || 0} | ${data.aTries || 0}`;
+            document.getElementById('stat_hFG').innerText = `${data.hFG1 || 0} | ${data.hFG2 || 0}`;
+            document.getElementById('stat_aFG').innerText = `${data.aFG1 || 0} | ${data.aFG2 || 0}`;
             document.getElementById('customStatBox').innerText = data.customStat || "";
 
             const renderList = (hist) => hist ? Object.values(hist).map(n => `<div>${n}</div>`).join('') : "";
