@@ -15,9 +15,16 @@
 
         #alertBox { 
             position: absolute; bottom: 0; width: 100%; background: #b71c1c; text-align: center; 
-            padding: 12px 0; font-weight: 900; font-size: 24px; display: none; z-index: 20; 
-            text-transform: uppercase; letter-spacing: 3px; border-top: 2px solid #ff4d4d;
-            white-space: pre-wrap; line-height: 1.1; /* REPAIRED FOR MULTI-LINE */
+            padding: 8px 0; font-weight: 900; font-size: 19px; display: none; z-index: 20; 
+            text-transform: uppercase; letter-spacing: 2px; border-top: 2px solid #ff4d4d;
+            white-space: pre-wrap; line-height: 1.1;
+            animation: flash 0.8s infinite;
+        }
+
+        @keyframes flash {
+            0% { background: #b71c1c; }
+            50% { background: #ff1a1a; }
+            100% { background: #b71c1c; }
         }
 
         .scorer-popup { position: absolute; bottom: -45px; left: 0; width: 100%; background: #ffcc00; color: #000; font-weight: 900; text-align: center; padding: 5px 0; font-size: 16px; transform: translateY(-100%); transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: -1; text-transform: uppercase; border-radius: 0 0 10px 10px; opacity: 0; }
@@ -33,6 +40,12 @@
         .scorer-list { width: 45%; font-size: 11px; font-weight: 700; color: #fff; text-transform: uppercase; line-height: 1.6; }
         #hScorerList { text-align: left; border-left: 3px solid #ffcc00; padding-left: 10px; }
         #aScorerList { text-align: right; border-right: 3px solid #ffcc00; padding-right: 10px; }
+
+        #customStatBox {
+            text-align: center; font-size: 13px; font-weight: 800; color: #ffcc00;
+            margin-top: 10px; padding-top: 8px; border-top: 1px solid #222;
+            white-space: pre-wrap; text-transform: uppercase; letter-spacing: 1px;
+        }
 
         .header { height: 60px; display: flex; align-items: center; padding: 0 40px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .timer-center { display: flex; align-items: center; gap: 15px; background: #000; padding: 5px 25px; border-radius: 30px; border: 1px solid #333; }
@@ -98,6 +111,7 @@
                 <div id="hScorerList" class="scorer-list"></div>
                 <div id="aScorerList" class="scorer-list"></div>
             </div>
+            <div id="customStatBox"></div>
         </div>
     </div>
 
@@ -121,6 +135,7 @@
             document.getElementById('mainBody').classList.toggle('stats-active', !!data.showStats);
             document.getElementById('stat_hTries').innerText = `${data.hTries || 0} | ${data.hConv || 0}`;
             document.getElementById('stat_aTries').innerText = `${data.aConv || 0} | ${data.aTries || 0}`;
+            document.getElementById('customStatBox').innerText = data.customStat || "";
 
             const renderList = (hist) => hist ? Object.values(hist).map(n => `<div>${n}</div>`).join('') : "";
             document.getElementById('hScorerList').innerHTML = renderList(data.hHistory);
