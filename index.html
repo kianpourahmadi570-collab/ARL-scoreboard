@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>ARL BROADCAST - LIVE</title>
+    <title>ARL LIVE</title>
     <style>
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; transition: background 0.5s; }
         body { background-size: cover; background-position: center; color: white; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; }
@@ -13,19 +13,19 @@
         .show-scorer { transform: translateY(0); opacity: 1; }
 
         /* STATS DRAWER */
-        #statsOverlay { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 850px; background: rgba(10, 10, 10, 0.96); border: 1px solid #333; border-radius: 0 0 15px 15px; padding: 15px 25px; transition: 0.5s ease-in-out; z-index: 5; display: flex; flex-direction: column; opacity: 0; }
-        .stats-active #statsOverlay { bottom: -180px; opacity: 1; }
+        #statsOverlay { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 850px; background: rgba(10, 10, 10, 0.98); border: 2px solid #333; border-radius: 0 0 15px 15px; padding: 15px 25px; transition: 0.6s cubic-bezier(0.4, 0, 0.2, 1); z-index: 5; display: flex; flex-direction: column; opacity: 0; }
+        .stats-active #statsOverlay { bottom: -200px; opacity: 1; }
         .stat-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; padding: 5px 0; }
-        .stat-label { font-weight: 800; color: #aaa; text-transform: uppercase; font-size: 12px; letter-spacing: 1px; }
+        .stat-label { font-weight: 800; color: #aaa; text-transform: uppercase; font-size: 11px; letter-spacing: 2px; }
         .stat-val { font-size: 20px; font-weight: 900; width: 80px; text-align: center; color: #ffcc00; }
 
         .scorer-columns { display: flex; justify-content: space-between; margin-top: 10px; gap: 20px; }
-        .scorer-list { width: 45%; font-size: 11px; font-weight: 700; color: #fff; text-transform: uppercase; line-height: 1.4; }
+        .scorer-list { width: 45%; font-size: 10px; font-weight: 700; color: #fff; text-transform: uppercase; line-height: 1.5; }
         #hScorerList { text-align: left; border-left: 3px solid #ffcc00; padding-left: 10px; }
         #aScorerList { text-align: right; border-right: 3px solid #ffcc00; padding-right: 10px; }
 
         /* STICKERS */
-        .sticker { position: absolute; top: -35px; left: 50%; transform: translateX(-50%); padding: 8px 40px; font-weight: 900; border-radius: 10px 10px 0 0; letter-spacing: 2px; font-size: 14px; display: none; text-transform: uppercase; box-shadow: 0 -5px 15px rgba(0,0,0,0.3); }
+        .sticker { position: absolute; top: -35px; left: 50%; transform: translateX(-50%); padding: 8px 40px; font-weight: 900; border-radius: 10px 10px 0 0; letter-spacing: 2px; font-size: 14px; display: none; text-transform: uppercase; }
         #finalsSticker { background: #ffd700; color: black; }
         #gfSticker { background: #2e7d32; color: white; border: 1px solid #4caf50; }
         #gpSticker { background: #ff4d4d; color: white; }
@@ -33,6 +33,7 @@
         .header { height: 60px; display: flex; align-items: center; padding: 0 40px; background: rgba(255,255,255,0.03); border-bottom: 1px solid rgba(255,255,255,0.05); }
         .timer-center { display: flex; align-items: center; gap: 15px; background: #000; padding: 5px 25px; border-radius: 30px; border: 1px solid #333; }
         #timer { font-size: 32px; font-weight: 900; width: 85px; text-align: center; font-variant-numeric: tabular-nums; }
+        
         .main-content { flex: 1; display: flex; align-items: center; justify-content: space-between; padding: 0 60px; }
         .team { display: flex; align-items: center; gap: 30px; width: 380px; }
         .team.away { flex-direction: row-reverse; text-align: right; }
@@ -66,8 +67,11 @@
             <div id="alertBox">VIDEO REFEREE</div>
         </div>
         <div id="statsOverlay">
-            <div class="stat-row"><div class="stat-val" id="stat_hTries">0</div><div class="stat-label">TRIES | CONVERSIONS</div><div class="stat-val" id="stat_aTries">0</div></div>
-            <div class="scorer-columns"><div id="hScorerList" class="scorer-list"></div><div id="aScorerList" class="scorer-list"></div></div>
+            <div class="stat-row"><div class="stat-val" id="stat_hTries">0 | 0</div><div class="stat-label">TRIES | GOALS</div><div class="stat-val" id="stat_aTries">0 | 0</div></div>
+            <div class="scorer-columns">
+                <div id="hScorerList" class="scorer-list"></div>
+                <div id="aScorerList" class="scorer-list"></div>
+            </div>
         </div>
     </div>
 
@@ -88,33 +92,49 @@
             document.getElementById('aName').innerText = data.aName || "AWAY";
             document.getElementById('matchStatus').innerText = data.status || "1ST HALF";
             
+            // Stats
             document.getElementById('stat_hTries').innerText = `${data.hTries || 0} | ${data.hConv || 0}`;
             document.getElementById('stat_aTries').innerText = `${data.aConv || 0} | ${data.aTries || 0}`;
 
-            const renderHistory = (hist) => hist ? Object.values(hist).map(n => `<div>${n}</div>`).join('') : "";
-            document.getElementById('hScorerList').innerHTML = renderHistory(data.hScorerHistory);
-            document.getElementById('aScorerList').innerHTML = renderHistory(data.aScorerHistory);
+            // Scorer Drawer Logic
+            const buildList = (hist) => hist ? Object.values(hist).map(n => `<div>${n}</div>`).join('') : "";
+            document.getElementById('hScorerList').innerHTML = buildList(data.hHistory);
+            document.getElementById('aScorerList').innerHTML = buildList(data.aHistory);
 
             document.getElementById('mainBody').classList.toggle('stats-active', !!data.showStats);
             
-            if(data.showHPopup) { document.getElementById('hScorerPopup').innerText = data.recentHScorer; document.getElementById('hScorerPopup').classList.add('show-scorer'); setTimeout(() => update(matchRef, { showHPopup: false }), 5000); }
-            else { document.getElementById('hScorerPopup').classList.remove('show-scorer'); }
+            // Popups
+            if(data.showHPopup) { 
+                document.getElementById('hScorerPopup').innerText = data.recentH; 
+                document.getElementById('hScorerPopup').classList.add('show-scorer'); 
+                setTimeout(() => update(matchRef, { showHPopup: false }), 4000); 
+            } else { document.getElementById('hScorerPopup').classList.remove('show-scorer'); }
 
-            if(data.showAPopup) { document.getElementById('aScorerPopup').innerText = data.recentAScorer; document.getElementById('aScorerPopup').classList.add('show-scorer'); setTimeout(() => update(matchRef, { showAPopup: false }), 5000); }
-            else { document.getElementById('aScorerPopup').classList.remove('show-scorer'); }
+            if(data.showAPopup) { 
+                document.getElementById('aScorerPopup').innerText = data.recentA; 
+                document.getElementById('aScorerPopup').classList.add('show-scorer'); 
+                setTimeout(() => update(matchRef, { showAPopup: false }), 4000); 
+            } else { document.getElementById('aScorerPopup').classList.remove('show-scorer'); }
 
+            // Stickers
             document.getElementById('finalsSticker').style.display = data.isFinals ? 'block' : 'none';
             document.getElementById('gfSticker').style.display = data.isGrandFinal ? 'block' : 'none';
             document.getElementById('gpSticker').style.display = data.isGoldenPoint ? 'block' : 'none';
 
+            // Try Anims
             if(data.tryHome) { document.getElementById('hTry').classList.add('show-try'); setTimeout(() => update(matchRef, { tryHome: false }), 3000); }
             else { document.getElementById('hTry').classList.remove('show-try'); }
             if(data.tryAway) { document.getElementById('aTry').classList.add('show-try'); setTimeout(() => update(matchRef, { tryAway: false }), 3000); }
             else { document.getElementById('aTry').classList.remove('show-try'); }
 
             if(data.bgUrl) document.body.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('${data.bgUrl}')`;
-            if(data.showAlert) { document.getElementById('alertBox').innerText = data.alertMsg || "VIDEO REFEREE"; document.getElementById('alertBox').style.display = 'block'; }
-            else { document.getElementById('alertBox').style.display = 'none'; }
+            if(data.hLogo) document.getElementById('hLogo').src = data.hLogo;
+            if(data.aLogo) document.getElementById('aLogo').src = data.aLogo;
+
+            if(data.showAlert) { 
+                document.getElementById('alertBox').innerText = data.alertMsg || "VIDEO REFEREE"; 
+                document.getElementById('alertBox').style.display = 'block'; 
+            } else { document.getElementById('alertBox').style.display = 'none'; }
 
             let t = Number(data.time) || 0;
             document.getElementById('timer').innerText = `${Math.floor(t / 60)}:${(t % 60).toString().padStart(2, '0')}`;
