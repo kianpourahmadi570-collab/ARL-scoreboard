@@ -56,9 +56,9 @@
 
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
 
-        /* Sponsor Section Styling */
-        #sponsorGrid { position: fixed; bottom: 15px; width: 100%; display: flex; justify-content: center; align-items: center; gap: 40px; height: 50px; z-index: 1; }
-        .sponsor-img { max-height: 100%; max-width: 150px; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); display: none; }
+        /* UPDATED: Larger Sponsor Section */
+        #sponsorGrid { position: fixed; bottom: 25px; width: 100%; display: flex; justify-content: center; align-items: center; gap: 60px; height: 85px; z-index: 1; }
+        .sponsor-img { max-height: 100%; max-width: 220px; object-fit: contain; filter: drop-shadow(0 0 10px rgba(0,0,0,0.8)); display: none; }
     </style>
 </head>
 <body id="mainBody">
@@ -141,18 +141,34 @@
             document.getElementById('aName').innerText = data.aName || "AWAY";
             document.getElementById('matchStatus').innerText = data.status || "1ST HALF";
             document.getElementById('mainBody').classList.toggle('stats-active', !!data.showStats);
+            
+            // Fixed Stats Display
             document.getElementById('stat_hTries').innerText = `${data.hTries || 0} | ${data.hConv || 0}`;
-            document.getElementById('stat_aTries').innerText = `${data.aConv || 0} | ${data.aTries || 0}`;
+            document.getElementById('stat_aTries').innerText = `${data.aTries || 0} | ${data.aConv || 0}`;
             document.getElementById('stat_hFG').innerText = `${data.hFG1 || 0} | ${data.hFG2 || 0}`;
             document.getElementById('stat_aFG').innerText = `${data.aFG1 || 0} | ${data.aFG2 || 0}`;
+            
             document.getElementById('customStatBox').innerText = data.customStat || "";
 
             const renderList = (hist) => hist ? Object.values(hist).map(n => `<div>${n}</div>`).join('') : "";
             document.getElementById('hScorerList').innerHTML = renderList(data.hHistory);
             document.getElementById('aScorerList').innerHTML = renderList(data.aHistory);
 
-            if(data.showHPopup) { document.getElementById('hScorerPopup').innerText = data.recentH; document.getElementById('hScorerPopup').classList.add('show-scorer'); setTimeout(() => update(matchRef, { showHPopup: false }), 4500); } else { document.getElementById('hScorerPopup').classList.remove('show-scorer'); }
-            if(data.showAPopup) { document.getElementById('aScorerPopup').innerText = data.recentA; document.getElementById('aScorerPopup').classList.add('show-scorer'); setTimeout(() => update(matchRef, { showAPopup: false }), 4500); } else { document.getElementById('aScorerPopup').classList.remove('show-scorer'); }
+            if(data.showHPopup) { 
+                document.getElementById('hScorerPopup').innerText = data.recentH; 
+                document.getElementById('hScorerPopup').classList.add('show-scorer'); 
+                setTimeout(() => update(matchRef, { showHPopup: false }), 4500); 
+            } else { 
+                document.getElementById('hScorerPopup').classList.remove('show-scorer'); 
+            }
+            
+            if(data.showAPopup) { 
+                document.getElementById('aScorerPopup').innerText = data.recentA; 
+                document.getElementById('aScorerPopup').classList.add('show-scorer'); 
+                setTimeout(() => update(matchRef, { showAPopup: false }), 4500); 
+            } else { 
+                document.getElementById('aScorerPopup').classList.remove('show-scorer'); 
+            }
 
             if(data.tryHome) document.getElementById('hTry').classList.add('show-try'); else document.getElementById('hTry').classList.remove('show-try');
             if(data.tryAway) document.getElementById('aTry').classList.add('show-try'); else document.getElementById('aTry').classList.remove('show-try');
@@ -165,16 +181,23 @@
             if(data.hLogo) document.getElementById('hLogo').src = data.hLogo;
             if(data.aLogo) document.getElementById('aLogo').src = data.aLogo;
 
-            if(data.showAlert) { document.getElementById('alertBox').innerText = data.alertMsg || "VIDEO REFEREE"; document.getElementById('alertBox').style.display = 'block'; } else { document.getElementById('alertBox').style.display = 'none'; }
+            if(data.showAlert) { 
+                document.getElementById('alertBox').innerText = data.alertMsg || "VIDEO REFEREE"; 
+                document.getElementById('alertBox').style.display = 'block'; 
+            } else { 
+                document.getElementById('alertBox').style.display = 'none'; 
+            }
 
-            // Sponsor Logic
+            // Enhanced Sponsor Logic
             for(let i=1; i<=5; i++) {
                 const img = document.getElementById('sp' + i);
-                if(data['sp' + i]) {
-                    img.src = data['sp' + i];
+                const url = data['sp' + i];
+                if(url && url.trim() !== "") {
+                    img.src = url;
                     img.style.display = 'block';
                 } else {
                     img.style.display = 'none';
+                    img.src = ""; // Clears broken image icon
                 }
             }
 
