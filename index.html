@@ -3,69 +3,65 @@
 <head>
     <title>ARL LIVE BROADCAST</title>
     <style>
-        body, html { margin: 0; padding: 0; width: 100%; min-height: 100%; background: #000; transition: background 0.8s ease; background-size: cover; background-position: center; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; transition: background 0.8s ease; background-size: cover; background-position: center; }
+        body { color: white; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; justify-content: center; align-items: center; }
         
-        /* Changed to allow scrolling for long scorer lists */
-        body { 
-            color: white; 
-            font-family: 'Segoe UI', sans-serif; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            padding-top: 50px; 
-            overflow-y: auto; 
-            overflow-x: hidden;
-        }
+        /* The container holds everything to ensure they move as one unit */
+        #container { position: relative; width: 1050px; height: 320px; z-index: 10; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
         
-        #container { position: relative; width: 1050px; display: flex; flex-direction: column; align-items: center; z-index: 10; }
+        /* Lift the entire board up when stats are active to make room for sponsors and drawer */
+        .stats-active #container { transform: translateY(-120px); }
 
-        .sticker { position: absolute; top: -33px; left: 50%; transform: translateX(-50%); padding: 8px 40px; font-weight: 900; border-radius: 10px 10px 0 0; font-size: 14px; display: none; text-transform: uppercase; z-index: 11; letter-spacing: 1px; border: 1px solid rgba(255,255,255,0.2); border-bottom: none; }
+        .sticker { position: absolute; top: -33px; left: 50%; transform: translateX(-50%); padding: 8px 40px; font-weight: 900; border-radius: 10px 10px 0 0; font-size: 14px; display: none; text-transform: uppercase; z-index: 5; letter-spacing: 1px; border: 1px solid rgba(255,255,255,0.2); border-bottom: none; }
         #gfSticker { background: #2e7d32; color: white; }
         #finalsSticker { background: #ffd700; color: #000; }
 
-        .board { position: relative; width: 100%; height: 320px; background: rgba(15, 15, 15, 0.98); border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 50px 100px rgba(0,0,0,0.9); display: flex; flex-direction: column; z-index: 10; overflow: hidden; flex-shrink: 0; }
+        .board { position: relative; width: 100%; height: 100%; background: rgba(15, 15, 15, 0.98); border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 50px 100px rgba(0,0,0,0.9); display: flex; flex-direction: column; z-index: 10; overflow: hidden; }
 
-        #alertBox { position: absolute; bottom: 0; width: 100%; background: #b71c1c; text-align: center; padding: 8px 0; font-weight: 900; font-size: 19px; display: none; z-index: 20; text-transform: uppercase; letter-spacing: 2px; border-top: 2px solid #ff4d4d; white-space: pre-wrap; line-height: 1.1; animation: flash 0.8s infinite; }
+        #alertBox { 
+            position: absolute; bottom: 0; width: 100%; background: #b71c1c; text-align: center; 
+            padding: 8px 0; font-weight: 900; font-size: 19px; display: none; z-index: 20; 
+            text-transform: uppercase; letter-spacing: 2px; border-top: 2px solid #ff4d4d;
+            white-space: pre-wrap; line-height: 1.1; animation: flash 0.8s infinite;
+        }
         @keyframes flash { 0% { background: #b71c1c; } 50% { background: #ff1a1a; } 100% { background: #b71c1c; } }
 
+        /* Scorer Popup Logic */
         .scorer-popup { position: absolute; bottom: -45px; left: 0; width: 100%; background: #ffcc00; color: #000; font-weight: 900; text-align: center; padding: 5px 0; font-size: 16px; transform: translateY(-100%); transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: -1; text-transform: uppercase; border-radius: 0 0 10px 10px; opacity: 0; }
         .show-scorer { transform: translateY(0); opacity: 1; }
 
-        /* Stats Section expands downwards now */
-        #statsOverlay { 
-            width: 850px; background: rgba(10, 10, 10, 0.98); border: 2px solid #333; 
-            border-top: none; border-radius: 0 0 15px 15px; padding: 0 25px 20px 25px; 
-            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1); z-index: 5; 
-            display: flex; flex-direction: column; opacity: 0; max-height: 0; overflow: hidden;
-        }
-        .stats-active #statsOverlay { opacity: 1; max-height: 3000px; padding-top: 100px; margin-top: -85px; }
+        /* Stats Drawer - Positioned relative to the container */
+        #statsOverlay { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 850px; background: rgba(10, 10, 10, 0.98); border: 2px solid #333; border-radius: 0 0 15px 15px; padding: 10px 25px; transition: 0.6s cubic-bezier(0.4, 0, 0.2, 1); z-index: 5; display: flex; flex-direction: column; opacity: 0; }
+        .stats-active #statsOverlay { bottom: -240px; opacity: 1; }
         
-        #sponsorGrid { width: 100%; display: flex; justify-content: center; align-items: center; gap: 60px; height: 85px; z-index: 6; opacity: 0; transition: 0.4s ease; margin-top: 10px; }
+        .stat-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; padding: 4px 0; }
+        .stat-label { font-weight: 800; color: #aaa; text-transform: uppercase; font-size: 10px; letter-spacing: 2px; }
+        .stat-val { font-size: 18px; font-weight: 900; width: 120px; text-align: center; color: #ffcc00; }
+        .scorer-columns { display: flex; justify-content: space-between; margin-top: 8px; gap: 20px; }
+        .scorer-list { width: 45%; font-size: 11px; font-weight: 700; color: #fff; text-transform: uppercase; line-height: 1.5; }
+        #hScorerList { text-align: left; border-left: 3px solid #ffcc00; padding-left: 10px; }
+        #aScorerList { text-align: right; border-right: 3px solid #ffcc00; padding-right: 10px; }
+
+        /* Sponsor Section - Fixed to the gap between board and drawer */
+        #sponsorGrid { 
+            position: absolute; bottom: -95px; width: 100%; display: flex; 
+            justify-content: center; align-items: center; gap: 60px; height: 85px; 
+            z-index: 6; opacity: 0; transition: 0.4s ease; 
+        }
         .stats-active #sponsorGrid { opacity: 1; }
         .sponsor-img { max-height: 100%; max-width: 220px; object-fit: contain; filter: drop-shadow(0 0 10px rgba(0,0,0,0.8)); display: none; }
 
-        .scorer-columns { display: flex; justify-content: space-between; margin-top: 15px; gap: 20px; }
-        .scorer-list { width: 45%; font-size: 13px; font-weight: 700; color: #fff; text-transform: uppercase; line-height: 1.4; }
-        #hScorerList { text-align: left; border-left: 3px solid #ffcc00; padding-left: 15px; }
-        #aScorerList { text-align: right; border-right: 3px solid #ffcc00; padding-right: 15px; }
-
+        /* Board Content Styles */
         .header { height: 60px; display: flex; align-items: center; padding: 0 40px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .timer-center { display: flex; align-items: center; gap: 15px; background: #000; padding: 5px 25px; border-radius: 30px; border: 1px solid #333; }
         #timer { font-size: 32px; font-weight: 900; width: 95px; text-align: center; font-variant-numeric: tabular-nums; }
-        
         .main-content { flex: 1; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; }
         .team { display: flex; align-items: center; gap: 20px; width: 400px; }
         .logo-wrap { position: relative; width: 150px; height: 150px; border-radius: 50%; background: #fff; border: 4px solid #333; flex-shrink: 0; }
         .team img { width: 100%; height: 100%; object-fit: contain; border-radius: 50%; }
-        
         .try-overlay { position: absolute; inset: 0; background: #ffcc00; color: black; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 900; opacity: 0; z-index: 100; border-radius: 50%; pointer-events: none; }
         .show-try { opacity: 1; animation: pulse 0.5s infinite; }
         .score { font-size: 85px; font-weight: 900; display: flex; align-items: center; gap: 10px; }
-        
-        .stat-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; padding: 8px 0; }
-        .stat-label { font-weight: 800; color: #aaa; text-transform: uppercase; font-size: 11px; letter-spacing: 2px; }
-        .stat-val { font-size: 19px; font-weight: 900; width: 120px; text-align: center; color: #ffcc00; }
-        
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
     </style>
 </head>
@@ -192,11 +188,6 @@
             if(data.hLogo) document.getElementById('hLogo').src = data.hLogo;
             if(data.aLogo) document.getElementById('aLogo').src = data.aLogo;
             
-            if(data.mainLogoUrl) {
-                document.getElementById('mainLogo').src = data.mainLogoUrl;
-                document.getElementById('mainLogo').style.display = 'block';
-            }
-
             for(let i=1; i<=5; i++) {
                 const img = document.getElementById('sp' + i);
                 if(data['sp' + i]) { img.src = data['sp' + i]; img.style.display = 'block'; }
