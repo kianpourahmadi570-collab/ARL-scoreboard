@@ -6,8 +6,12 @@
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; transition: background 0.8s ease; background-size: cover; background-position: center; }
         body { color: white; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; justify-content: center; align-items: center; }
         
-        #container { position: relative; width: 1050px; height: 320px; z-index: 10; }
+        /* The container holds everything to ensure they move as one unit */
+        #container { position: relative; width: 1050px; height: 320px; z-index: 10; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
         
+        /* Lift the entire board up when stats are active to make room for sponsors and drawer */
+        .stats-active #container { transform: translateY(-120px); }
+
         .sticker { position: absolute; top: -33px; left: 50%; transform: translateX(-50%); padding: 8px 40px; font-weight: 900; border-radius: 10px 10px 0 0; font-size: 14px; display: none; text-transform: uppercase; z-index: 5; letter-spacing: 1px; border: 1px solid rgba(255,255,255,0.2); border-bottom: none; }
         #gfSticker { background: #2e7d32; color: white; }
         #finalsSticker { background: #ffd700; color: #000; }
@@ -20,12 +24,13 @@
             text-transform: uppercase; letter-spacing: 2px; border-top: 2px solid #ff4d4d;
             white-space: pre-wrap; line-height: 1.1; animation: flash 0.8s infinite;
         }
-
         @keyframes flash { 0% { background: #b71c1c; } 50% { background: #ff1a1a; } 100% { background: #b71c1c; } }
 
+        /* Scorer Popup Logic */
         .scorer-popup { position: absolute; bottom: -45px; left: 0; width: 100%; background: #ffcc00; color: #000; font-weight: 900; text-align: center; padding: 5px 0; font-size: 16px; transform: translateY(-100%); transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: -1; text-transform: uppercase; border-radius: 0 0 10px 10px; opacity: 0; }
         .show-scorer { transform: translateY(0); opacity: 1; }
 
+        /* Stats Drawer - Positioned relative to the container */
         #statsOverlay { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 850px; background: rgba(10, 10, 10, 0.98); border: 2px solid #333; border-radius: 0 0 15px 15px; padding: 10px 25px; transition: 0.6s cubic-bezier(0.4, 0, 0.2, 1); z-index: 5; display: flex; flex-direction: column; opacity: 0; }
         .stats-active #statsOverlay { bottom: -240px; opacity: 1; }
         
@@ -37,28 +42,27 @@
         #hScorerList { text-align: left; border-left: 3px solid #ffcc00; padding-left: 10px; }
         #aScorerList { text-align: right; border-right: 3px solid #ffcc00; padding-right: 10px; }
 
-        #customStatBox { text-align: center; font-size: 13px; font-weight: 800; color: #ffcc00; margin-top: 8px; padding-top: 5px; border-top: 1px solid #222; white-space: pre-wrap; text-transform: uppercase; letter-spacing: 1px; }
+        /* Sponsor Section - Fixed to the gap between board and drawer */
+        #sponsorGrid { 
+            position: absolute; bottom: -95px; width: 100%; display: flex; 
+            justify-content: center; align-items: center; gap: 60px; height: 85px; 
+            z-index: 6; opacity: 0; transition: 0.4s ease; 
+        }
+        .stats-active #sponsorGrid { opacity: 1; }
+        .sponsor-img { max-height: 100%; max-width: 220px; object-fit: contain; filter: drop-shadow(0 0 10px rgba(0,0,0,0.8)); display: none; }
 
+        /* Board Content Styles */
         .header { height: 60px; display: flex; align-items: center; padding: 0 40px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .timer-center { display: flex; align-items: center; gap: 15px; background: #000; padding: 5px 25px; border-radius: 30px; border: 1px solid #333; }
         #timer { font-size: 32px; font-weight: 900; width: 95px; text-align: center; font-variant-numeric: tabular-nums; }
-        
         .main-content { flex: 1; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; }
         .team { display: flex; align-items: center; gap: 20px; width: 400px; }
-        .team.away { flex-direction: row-reverse; text-align: right; }
         .logo-wrap { position: relative; width: 150px; height: 150px; border-radius: 50%; background: #fff; border: 4px solid #333; flex-shrink: 0; }
         .team img { width: 100%; height: 100%; object-fit: contain; border-radius: 50%; }
-        
         .try-overlay { position: absolute; inset: 0; background: #ffcc00; color: black; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 900; opacity: 0; z-index: 100; border-radius: 50%; pointer-events: none; }
         .show-try { opacity: 1; animation: pulse 0.5s infinite; }
-        .team-name { font-size: 38px; font-weight: 900; flex: 1; text-transform: uppercase; white-space: pre-wrap; line-height: 1; }
         .score { font-size: 85px; font-weight: 900; display: flex; align-items: center; gap: 10px; }
-
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
-
-        /* UPDATED: Larger Sponsor Section */
-        #sponsorGrid { position: fixed; bottom: 25px; width: 100%; display: flex; justify-content: center; align-items: center; gap: 60px; height: 85px; z-index: 1; }
-        .sponsor-img { max-height: 100%; max-width: 220px; object-fit: contain; filter: drop-shadow(0 0 10px rgba(0,0,0,0.8)); display: none; }
     </style>
 </head>
 <body id="mainBody">
@@ -71,7 +75,7 @@
                 <div style="flex:1; font-weight:700; color:#aaa;">ARL PREMIERSHIP</div>
                 <div class="timer-center">
                     <img id="mainLogo" src="" style="height:35px; display:none;">
-                    <span id="timer">20:00</span>
+                    <span id="timer">00:00</span>
                 </div>
                 <div style="flex: 1; text-align: right; font-weight: 900; font-size: 14px;"><span style="color: #ff4d4d;">LIVE</span> | <span id="matchStatus" style="color: #4caf50;">1ST HALF</span></div>
             </div>
@@ -85,7 +89,7 @@
                     <div class="team-name" id="hName">HOME</div>
                 </div>
                 <div class="score"><span id="hScore">0</span><div style="color:#444;">-</div><span id="aScore">0</span></div>
-                <div class="team away">
+                <div class="team away" style="flex-direction: row-reverse; text-align: right;">
                     <div class="logo-wrap">
                         <div id="aTry" class="try-overlay">TRY!</div>
                         <div id="aScorerPopup" class="scorer-popup">PLAYER</div>
@@ -95,6 +99,14 @@
                 </div>
             </div>
             <div id="alertBox">VIDEO REFEREE</div>
+        </div>
+
+        <div id="sponsorGrid">
+            <img id="sp1" class="sponsor-img">
+            <img id="sp2" class="sponsor-img">
+            <img id="sp3" class="sponsor-img">
+            <img id="sp4" class="sponsor-img">
+            <img id="sp5" class="sponsor-img">
         </div>
 
         <div id="statsOverlay">
@@ -112,97 +124,85 @@
                 <div id="hScorerList" class="scorer-list"></div>
                 <div id="aScorerList" class="scorer-list"></div>
             </div>
-            <div id="customStatBox"></div>
         </div>
-    </div>
-
-    <div id="sponsorGrid">
-        <img id="sp1" class="sponsor-img">
-        <img id="sp2" class="sponsor-img">
-        <img id="sp3" class="sponsor-img">
-        <img id="sp4" class="sponsor-img">
-        <img id="sp5" class="sponsor-img">
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        const firebaseConfig = { apiKey: "AIzaSyA8Ju6YR84BY8r2a7PtAzC41wLiPzU_Qck", authDomain: "arl-scoreboard.firebaseapp.com", databaseURL: "https://arl-scoreboard-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "arl-scoreboard" };
+        const firebaseConfig = { 
+            apiKey: "AIzaSyA8Ju6YR84BY8r2a7PtAzC41wLiPzU_Qck", 
+            authDomain: "arl-scoreboard.firebaseapp.com", 
+            databaseURL: "https://arl-scoreboard-default-rtdb.asia-southeast1.firebasedatabase.app", 
+            projectId: "arl-scoreboard" 
+        };
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const matchRef = ref(db, 'nrlMatch');
 
         onValue(matchRef, (snap) => {
             const data = snap.val() || {};
+            
+            // Layout Controls
+            document.getElementById('mainBody').classList.toggle('stats-active', !!data.showStats);
+            document.getElementById('gfSticker').style.display = data.isGrandFinal ? 'block' : 'none';
+            document.getElementById('finalsSticker').style.display = data.isFinals ? 'block' : 'none';
+            
+            // Score and Names
             document.getElementById('hScore').innerText = data.hScore || 0;
             document.getElementById('aScore').innerText = data.aScore || 0;
             document.getElementById('hName').innerText = data.hName || "HOME";
             document.getElementById('aName').innerText = data.aName || "AWAY";
             document.getElementById('matchStatus').innerText = data.status || "1ST HALF";
-            document.getElementById('mainBody').classList.toggle('stats-active', !!data.showStats);
-            
-            // Fixed Stats Display
+
+            // Stats Logic
             document.getElementById('stat_hTries').innerText = `${data.hTries || 0} | ${data.hConv || 0}`;
             document.getElementById('stat_aTries').innerText = `${data.aTries || 0} | ${data.aConv || 0}`;
             document.getElementById('stat_hFG').innerText = `${data.hFG1 || 0} | ${data.hFG2 || 0}`;
             document.getElementById('stat_aFG').innerText = `${data.aFG1 || 0} | ${data.aFG2 || 0}`;
-            
-            document.getElementById('customStatBox').innerText = data.customStat || "";
 
+            // Scorer Lists
             const renderList = (hist) => hist ? Object.values(hist).map(n => `<div>${n}</div>`).join('') : "";
             document.getElementById('hScorerList').innerHTML = renderList(data.hHistory);
             document.getElementById('aScorerList').innerHTML = renderList(data.aHistory);
 
+            // Popups & Overlays
             if(data.showHPopup) { 
                 document.getElementById('hScorerPopup').innerText = data.recentH; 
                 document.getElementById('hScorerPopup').classList.add('show-scorer'); 
                 setTimeout(() => update(matchRef, { showHPopup: false }), 4500); 
-            } else { 
-                document.getElementById('hScorerPopup').classList.remove('show-scorer'); 
-            }
+            } else { document.getElementById('hScorerPopup').classList.remove('show-scorer'); }
             
             if(data.showAPopup) { 
                 document.getElementById('aScorerPopup').innerText = data.recentA; 
                 document.getElementById('aScorerPopup').classList.add('show-scorer'); 
                 setTimeout(() => update(matchRef, { showAPopup: false }), 4500); 
-            } else { 
-                document.getElementById('aScorerPopup').classList.remove('show-scorer'); 
-            }
+            } else { document.getElementById('aScorerPopup').classList.remove('show-scorer'); }
 
             if(data.tryHome) document.getElementById('hTry').classList.add('show-try'); else document.getElementById('hTry').classList.remove('show-try');
             if(data.tryAway) document.getElementById('aTry').classList.add('show-try'); else document.getElementById('aTry').classList.remove('show-try');
 
-            document.getElementById('gfSticker').style.display = data.isGrandFinal ? 'block' : 'none';
-            document.getElementById('finalsSticker').style.display = data.isFinals ? 'block' : 'none';
-            
+            // Assets & Sponsors
             if(data.bgUrl) document.body.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('${data.bgUrl}')`;
-            if(data.mainLogoUrl) { document.getElementById('mainLogo').src = data.mainLogoUrl; document.getElementById('mainLogo').style.display = 'block'; }
             if(data.hLogo) document.getElementById('hLogo').src = data.hLogo;
             if(data.aLogo) document.getElementById('aLogo').src = data.aLogo;
+            
+            for(let i=1; i<=5; i++) {
+                const img = document.getElementById('sp' + i);
+                if(data['sp' + i]) { img.src = data['sp' + i]; img.style.display = 'block'; }
+                else { img.style.display = 'none'; img.src = ""; }
+            }
 
+            // Timer
+            let t = Number(data.time) || 0;
+            document.getElementById('timer').innerText = `${Math.floor(t / 60)}:${(t % 60).toString().padStart(2, '0')}`;
+
+            // Alert Box
             if(data.showAlert) { 
                 document.getElementById('alertBox').innerText = data.alertMsg || "VIDEO REFEREE"; 
                 document.getElementById('alertBox').style.display = 'block'; 
-            } else { 
-                document.getElementById('alertBox').style.display = 'none'; 
-            }
-
-            // Enhanced Sponsor Logic
-            for(let i=1; i<=5; i++) {
-                const img = document.getElementById('sp' + i);
-                const url = data['sp' + i];
-                if(url && url.trim() !== "") {
-                    img.src = url;
-                    img.style.display = 'block';
-                } else {
-                    img.style.display = 'none';
-                    img.src = ""; // Clears broken image icon
-                }
-            }
-
-            let t = Number(data.time) || 0;
-            document.getElementById('timer').innerText = `${Math.floor(t / 60)}:${(t % 60).toString().padStart(2, '0')}`;
+            } else { document.getElementById('alertBox').style.display = 'none'; }
         });
     </script>
 </body>
