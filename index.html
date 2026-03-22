@@ -6,8 +6,7 @@
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; transition: background 0.8s ease; background-size: cover; background-position: center; }
         body { color: white; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; justify-content: center; align-items: center; }
         
-        /* The container moves slightly up to make room for the drawer dropping down */
-        #container { position: relative; width: 1050px; height: 320px; z-index: 10; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+        #container { position: relative; width: 1050px; height: 320px; z-index: 10; transition: transform 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .stats-active #container { transform: translateY(-80px); }
 
         .sticker { position: absolute; top: -33px; left: 50%; transform: translateX(-50%); padding: 8px 40px; font-weight: 900; border-radius: 10px 10px 0 0; font-size: 14px; display: none; text-transform: uppercase; z-index: 5; letter-spacing: 1px; border: 1px solid rgba(255,255,255,0.2); border-bottom: none; }
@@ -16,7 +15,6 @@
 
         .board { position: relative; width: 100%; height: 100%; background: rgba(15, 15, 15, 0.98); border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 50px 100px rgba(0,0,0,0.9); display: flex; flex-direction: column; z-index: 10; overflow: hidden; }
 
-        /* Larger Team Names */
         .team-name { font-size: 32px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
 
         #alertBox { 
@@ -27,62 +25,63 @@
         }
         @keyframes flash { 0% { background: #b71c1c; } 50% { background: #ff1a1a; } 100% { background: #b71c1c; } }
 
-        .scorer-popup { position: absolute; bottom: -45px; left: 0; width: 100%; background: #ffcc00; color: #000; font-weight: 900; text-align: center; padding: 5px 0; font-size: 16px; transform: translateY(-100%); transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: -1; text-transform: uppercase; border-radius: 0 0 10px 10px; opacity: 0; }
-        .show-scorer { transform: translateY(0); opacity: 1; }
-
-        /* Stats Drawer - Anchored to the bottom of the board and slides DOWN */
         #statsOverlay { 
             position: absolute; 
-            top: 100%; /* Start at the bottom edge of the board */
+            top: 100%; 
             left: 50%; 
-            transform: translateX(-50%) translateY(-20px); /* Tucked behind board initially */
+            transform: translateX(-50%) translateY(-30px); 
             width: 850px; 
             background: rgba(10, 10, 10, 0.98); 
             border: 2px solid #333; 
             border-top: none; 
             border-radius: 0 0 15px 15px; 
             padding: 20px 25px; 
-            transition: 0.6s cubic-bezier(0.4, 0, 0.2, 1); 
+            transition: 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
             z-index: 5; 
             display: flex; 
             flex-direction: column; 
             opacity: 0; 
-            pointer-events: none;
         }
-        /* When active, slide it fully down and fade in */
-        .stats-active #statsOverlay { 
-            transform: translateX(-50%) translateY(0); 
-            opacity: 1; 
-            pointer-events: auto;
-        }
+        .stats-active #statsOverlay { transform: translateX(-50%) translateY(0); opacity: 1; }
         
-        .stat-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; padding: 6px 0; }
+        .stat-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; padding: 6px 0; flex-shrink: 0; }
         .stat-label { font-weight: 800; color: #aaa; text-transform: uppercase; font-size: 10px; letter-spacing: 2px; }
         .stat-val { font-size: 18px; font-weight: 900; width: 120px; text-align: center; color: #ffcc00; }
-        .scorer-columns { display: flex; justify-content: space-between; margin-top: 10px; gap: 20px; }
-        .scorer-list { width: 45%; font-size: 11px; font-weight: 700; color: #fff; text-transform: uppercase; line-height: 1.5; }
+        
+        /* SCROLLABLE SECTION */
+        .scorer-columns { 
+            display: flex; 
+            justify-content: space-between; 
+            margin-top: 10px; 
+            gap: 20px; 
+        }
+        .scorer-list { 
+            width: 48%; 
+            max-height: 110px; /* Limits height for high scoring games */
+            overflow-y: auto; 
+            font-size: 12px; 
+            font-weight: 700; 
+            color: #fff; 
+            text-transform: uppercase; 
+            line-height: 1.6; 
+            padding-bottom: 5px;
+        }
+
+        /* Custom thin scrollbar */
+        .scorer-list::-webkit-scrollbar { width: 4px; }
+        .scorer-list::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+        .scorer-list::-webkit-scrollbar-thumb { background: #ffcc00; border-radius: 10px; }
+
         #hScorerList { text-align: left; border-left: 3px solid #ffcc00; padding-left: 10px; }
         #aScorerList { text-align: right; border-right: 3px solid #ffcc00; padding-right: 10px; }
 
-        /* Sponsors also move down with the drawer */
         #sponsorGrid { 
-            position: absolute; 
-            top: 100%; 
-            width: 100%; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            gap: 60px; 
-            height: 85px; 
-            z-index: 6; 
-            opacity: 0; 
-            transition: 0.6s ease; 
+            position: absolute; top: 100%; width: 100%; display: flex; 
+            justify-content: center; align-items: center; gap: 60px; height: 85px; 
+            z-index: 6; opacity: 0; transition: 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
             pointer-events: none;
         }
-        .stats-active #sponsorGrid { 
-            transform: translateY(220px); /* Adjust this based on drawer height */
-            opacity: 1; 
-        }
+        .stats-active #sponsorGrid { transform: translateY(225px); opacity: 1; }
         .sponsor-img { max-height: 100%; max-width: 220px; object-fit: contain; filter: drop-shadow(0 0 10px rgba(0,0,0,0.8)); display: none; }
 
         .header { height: 60px; display: flex; align-items: center; padding: 0 40px; border-bottom: 1px solid rgba(255,255,255,0.05); }
@@ -116,7 +115,6 @@
                 <div class="team home">
                     <div class="logo-wrap">
                         <div id="hTry" class="try-overlay">TRY!</div>
-                        <div id="hScorerPopup" class="scorer-popup">PLAYER</div>
                         <img id="hLogo" src="">
                     </div>
                     <div class="team-name" id="hName">HOME</div>
@@ -125,7 +123,6 @@
                 <div class="team away" style="flex-direction: row-reverse; text-align: right;">
                     <div class="logo-wrap">
                         <div id="aTry" class="try-overlay">TRY!</div>
-                        <div id="aScorerPopup" class="scorer-popup">PLAYER</div>
                         <img id="aLogo" src="">
                     </div>
                     <div class="team-name" id="aName">AWAY</div>
@@ -176,17 +173,14 @@
 
         onValue(matchRef, (snap) => {
             const data = snap.val() || {};
-            
             document.getElementById('mainBody').classList.toggle('stats-active', !!data.showStats);
             document.getElementById('gfSticker').style.display = data.isGrandFinal ? 'block' : 'none';
             document.getElementById('finalsSticker').style.display = data.isFinals ? 'block' : 'none';
-            
             document.getElementById('hScore').innerText = data.hScore || 0;
             document.getElementById('aScore').innerText = data.aScore || 0;
             document.getElementById('hName').innerText = data.hName || "HOME";
             document.getElementById('aName').innerText = data.aName || "AWAY";
             document.getElementById('matchStatus').innerText = data.status || "1ST HALF";
-
             document.getElementById('stat_hTries').innerText = `${data.hTries || 0} | ${data.hConv || 0}`;
             document.getElementById('stat_aTries').innerText = `${data.aTries || 0} | ${data.aConv || 0}`;
             document.getElementById('stat_hFG').innerText = `${data.hFG1 || 0} | ${data.hFG2 || 0}`;
@@ -195,18 +189,6 @@
             const renderList = (hist) => hist ? Object.values(hist).map(n => `<div>${n}</div>`).join('') : "";
             document.getElementById('hScorerList').innerHTML = renderList(data.hHistory);
             document.getElementById('aScorerList').innerHTML = renderList(data.aHistory);
-
-            if(data.showHPopup) { 
-                document.getElementById('hScorerPopup').innerText = data.recentH; 
-                document.getElementById('hScorerPopup').classList.add('show-scorer'); 
-                setTimeout(() => update(matchRef, { showHPopup: false }), 4500); 
-            } else { document.getElementById('hScorerPopup').classList.remove('show-scorer'); }
-            
-            if(data.showAPopup) { 
-                document.getElementById('aScorerPopup').innerText = data.recentA; 
-                document.getElementById('aScorerPopup').classList.add('show-scorer'); 
-                setTimeout(() => update(matchRef, { showAPopup: false }), 4500); 
-            } else { document.getElementById('aScorerPopup').classList.remove('show-scorer'); }
 
             if(data.tryHome) document.getElementById('hTry').classList.add('show-try'); else document.getElementById('hTry').classList.remove('show-try');
             if(data.tryAway) document.getElementById('aTry').classList.add('show-try'); else document.getElementById('aTry').classList.remove('show-try');
